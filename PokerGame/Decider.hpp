@@ -27,6 +27,7 @@ private:
     char atLeastFiveSuit();
     char atLeastFiveSuits = 'n';
     map<int, int>  countNumbers();
+    bool isConsecutive(vector<int>);
    
 public:
     bool isRoyalFlush();

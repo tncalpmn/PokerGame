@@ -15,6 +15,8 @@ bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.g
 bool sortNumeric (int first,int second) { return (first < second);}
 bool sortSuits (Card first,Card second) { return (first.getSuit() < second.getSuit());}
 int max (int first,int second) {if(first > second) return first; else return second;}
+bool containsNumber(vector<int> vec, int num ){return find(vec.begin(), vec.end(), num) != vec.end();}
+
 
 Decider::Decider(){
     
@@ -113,6 +115,39 @@ char Decider::atLeastFiveSuit(){
 
 }
 
+bool Decider::isConsecutive(vector<int> lisOfCards){
+    
+    bool isConsecutive = false;
+    
+    sort(lisOfCards.begin(), lisOfCards.end(), sortNumeric);
+    
+    if(containsNumber(lisOfCards, 1)  &&
+       containsNumber(lisOfCards, 13) &&
+       containsNumber(lisOfCards, 12) &&
+       containsNumber(lisOfCards, 11)&&
+       containsNumber(lisOfCards, 10)){
+        
+        isConsecutive = true;
+    }else{
+        int counter = 0;
+        for(int num : lisOfCards){
+            if(counter == 3){ // Sorted List therefore check first 3 Cards only
+                break;
+            }else if(containsNumber(lisOfCards,num +1 )  &&
+                     containsNumber(lisOfCards, num + 2) &&
+                     containsNumber(lisOfCards, num + 3) &&
+                     containsNumber(lisOfCards, num + 4))
+            {
+                isConsecutive = true;
+                break;
+            }
+            counter++;
+        }
+    }
+    
+    return isConsecutive;
+}
+
 bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO return high Card
     
     bool isSF = false;
@@ -124,31 +159,7 @@ bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO 
                 suitFilteredCardNumbers.push_back(crd.getNumber());
             }
         }
-        sort(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), sortNumeric);
-        
-        if(find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), 1) != suitFilteredCardNumbers.end()  &&
-           find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), 13) != suitFilteredCardNumbers.end() &&
-           find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), 12) != suitFilteredCardNumbers.end() &&
-           find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), 11) != suitFilteredCardNumbers.end() &&
-           find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), 10) != suitFilteredCardNumbers.end()){
-        
-            isSF = true;
-        }else{
-            int counter = 0;
-            for(int num : suitFilteredCardNumbers){
-                if(counter == 3){ // Sorted List therefore check first 3 Cards only
-                    break;
-                }else if(find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), num +1) != suitFilteredCardNumbers.end() &&
-                   find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), num +2) != suitFilteredCardNumbers.end()  &&
-                   find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), num +3) != suitFilteredCardNumbers.end()  &&
-                   find(suitFilteredCardNumbers.begin(), suitFilteredCardNumbers.end(), num +4) != suitFilteredCardNumbers.end())
-                {
-                    isSF = true;
-                    break;
-                }
-                counter++;
-            }
-        }
+        isSF = isConsecutive(suitFilteredCardNumbers);
     }else{
         isSF = false;
     }
