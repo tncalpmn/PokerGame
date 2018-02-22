@@ -21,11 +21,12 @@ class Decider {
     
 private:
     vector<Card> all7Cards;
-    map<char, int> countSuits(vector<Card>);
+    map<char, int> countSuits();
     map<char, int> numbOfSuits;
     map<int, int> numbOfNumbers;
     char atLeastFiveSuit();
-    map<int, int>  countNumbers(vector<Card>);
+    char atLeastFiveSuits = 'n';
+    map<int, int>  countNumbers();
    
 public:
     bool isRoyalFlush();

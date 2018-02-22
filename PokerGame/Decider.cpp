@@ -21,9 +21,10 @@ Decider::Decider(){
 }
 
 Decider::Decider(vector<Card> all7Cards){
-    numbOfSuits = countSuits(all7Cards);
-    numbOfNumbers = countNumbers(all7Cards);
     this->all7Cards = all7Cards;
+    numbOfSuits = countSuits();
+    numbOfNumbers = countNumbers();
+    atLeastFiveSuits = atLeastFiveSuit();
 }
 
 bool Decider::isRoyalFlush(){ // Ex: (S_10, S_11, S_12, S_13, S_1, C_1, C_11)
@@ -58,7 +59,7 @@ bool Decider::isRoyalFlush(){ // Ex: (S_10, S_11, S_12, S_13, S_1, C_1, C_11)
     return isRF;
 }
 
-map<char, int>  Decider::countSuits(vector<Card> all7Cards){
+map<char, int>  Decider::countSuits(){
     
      map<char, int> suitCounts;
      
@@ -82,7 +83,7 @@ map<char, int>  Decider::countSuits(vector<Card> all7Cards){
     return suitCounts;
 }
 
-map<int, int> Decider::countNumbers(vector<Card> all7Cards){
+map<int, int> Decider::countNumbers(){
     
     map<int, int> numberCounts;
     
@@ -99,28 +100,27 @@ map<int, int> Decider::countNumbers(vector<Card> all7Cards){
 }
 
 char Decider::atLeastFiveSuit(){
-    char atLeastFiveSuit = 'n';
+    
     map<char, int>::iterator it;
     
     for(it = numbOfSuits.begin(); it != numbOfSuits.end(); it++){
         if(it->second >= 5){
-            atLeastFiveSuit = it->first;
+            atLeastFiveSuits = it->first;
         }
     }
     
-    return atLeastFiveSuit;
+    return atLeastFiveSuits;
 
 }
 
 bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO return high Card
     
     bool isSF = false;
-    char atLFiveSuit = atLeastFiveSuit();
     
-    if(atLFiveSuit != 'n'){
+    if(atLeastFiveSuits != 'n'){
         vector<int> suitFilteredCardNumbers;
         for(Card crd : all7Cards){
-            if(crd.getSuit() == atLFiveSuit){
+            if(crd.getSuit() == atLeastFiveSuits){
                 suitFilteredCardNumbers.push_back(crd.getNumber());
             }
         }
@@ -155,7 +155,7 @@ bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO 
     return isSF;
 }
 
-bool Decider::is4ofaKind(){ // TODO In Case of Two Use have 4 Of a Kind select high card
+bool Decider::is4ofaKind(){ // TODO In Case of multiple User have 4 Of a Kind select high card
     
     bool is4K = false;
     
@@ -169,13 +169,32 @@ bool Decider::is4ofaKind(){ // TODO In Case of Two Use have 4 Of a Kind select h
 }
 
 bool Decider::isFullHouse(){
-    // TODO
-    return false;
+    
+    bool isFH = false;
+    bool checked2 = false;
+    bool checked3 = false;
+    
+    for(pair<int,int> item : numbOfNumbers){
+        
+        if(item.second == 3 && !checked3){
+            checked3 = true;
+        }else if(item.second >= 2){
+            checked2 = true;
+        }
+        
+        if(checked3 && checked2){
+            isFH = true;
+            break;
+        }
+    }
+    
+    return isFH;
 }
 
 bool Decider::isFlush(){
-    // TODO
-    return false;
+    
+    return (atLeastFiveSuits != 'n') ?  true : false;
+    
 }
 
 bool Decider::isStraight(){

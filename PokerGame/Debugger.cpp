@@ -114,6 +114,34 @@ void Debugger::testClass_Decider(){
     cout << "Is this Combination a Four of a Kind: ";
     decider.is4ofaKind() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;
     
+    // Test_4.1 Full House
+    test7Cards.clear();
+    test7Cards.push_back(Card('s',3));      // Random
+    test7Cards.push_back(Card('d',3));
+    test7Cards.push_back(Card('h',3));
+    test7Cards.push_back(Card('c',8));
+    test7Cards.push_back(Card('d',6));
+    test7Cards.push_back(Card('h',6));      // Random
+    test7Cards.push_back(Card('s',6));      // Random
+    
+    
+    decider = Decider(test7Cards);
+    cout << "Is this Combination a Full House: ";
+    decider.isFullHouse() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;
+    
+    // Test_5.1 Flush
+    test7Cards.clear();
+    test7Cards.push_back(Card('s',1));
+    test7Cards.push_back(Card('s',11));
+    test7Cards.push_back(Card('s',13));
+    test7Cards.push_back(Card('s',8));      // Random
+    test7Cards.push_back(Card('c',6));      // Random
+    test7Cards.push_back(Card('h',6));      // Random
+    test7Cards.push_back(Card('s',6));
+    
+    decider = Decider(test7Cards);
+    cout << "Is this Combination a Flush: ";
+    decider.isFlush() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;
 
     cout << "DEBUG_END: testClass_Decider" << endl;
 }
