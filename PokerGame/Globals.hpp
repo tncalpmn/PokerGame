@@ -11,7 +11,7 @@
 
 
 static bool isDebuggerOn = true;
-const int smallBlindAmount = 5;
-const int bigBlindAmount = smallBlindAmount * 2;
+const int SMALL_BLIND = 5;
+const int BIG_BLIND = SMALL_BLIND * 2;
 
 #endif /* Globals_h */

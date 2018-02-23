@@ -18,10 +18,6 @@ int max (int first,int second) {if(first > second) return first; else return sec
 bool containsNumber(vector<int> vec, int num ){return find(vec.begin(), vec.end(), num) != vec.end();}
 
 
-Decider::Decider(){
-    
-}
-
 Decider::Decider(vector<Card> all7Cards){
     this->all7Cards = all7Cards;
     numbOfSuits = countSuits();
@@ -110,9 +106,7 @@ char Decider::atLeastFiveSuit(){
             atLeastFiveSuits = it->first;
         }
     }
-    
     return atLeastFiveSuits;
-
 }
 
 bool Decider::isConsecutive(vector<int> lisOfCards){
@@ -124,7 +118,7 @@ bool Decider::isConsecutive(vector<int> lisOfCards){
     if(containsNumber(lisOfCards, 1)  &&
        containsNumber(lisOfCards, 13) &&
        containsNumber(lisOfCards, 12) &&
-       containsNumber(lisOfCards, 11)&&
+       containsNumber(lisOfCards, 11) &&
        containsNumber(lisOfCards, 10)){
         
         isConsecutive = true;
@@ -203,27 +197,56 @@ bool Decider::isFullHouse(){
 }
 
 bool Decider::isFlush(){
-    
     return (atLeastFiveSuits != 'n') ?  true : false;
-    
 }
 
 bool Decider::isStraight(){
-    // TODO
-    return false;
+    
+    vector<int> cardNumbers;
+    for(Card crd : all7Cards){
+        cardNumbers.push_back(crd.getNumber());
+    }
+    
+    return isConsecutive(cardNumbers);
 }
 
 bool Decider::is3ofaKind(){
-    // TODO
-    return false;
+    
+    bool is3K = false;
+    
+    for(pair<int,int> item : numbOfNumbers){
+        if(item.second == 3){
+            is3K = true;
+            break;
+        }
+    }
+    return is3K;
 }
 
 bool Decider::is2Pair(){
-    // TODO
-    return false;
+    bool is2P = false;
+    int counter = 0;
+    
+    for(pair<int,int> item : numbOfNumbers){
+        if(item.second == 2){
+            counter++;
+        }
+        if(counter == 2){
+            is2P = true;
+            break;
+        }
+    }
+    return is2P;
 }
 
 bool Decider::is1Pair(){
-    // TODO
-    return false;
+    bool is1P = false;
+    
+    for(pair<int,int> item : numbOfNumbers){
+        if(item.second == 2){
+            is1P = true;
+            break;
+        }
+    }
+    return is1P;
 }

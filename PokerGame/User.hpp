@@ -35,6 +35,7 @@ public:
     void setBlind(bool,bool);
     void setId(unsigned int);
     Card* getCards();
+    void setCards(Card, Card);
     Chips& getChips();
     unsigned int getId();
     void addCurrentRoundMoney(int);

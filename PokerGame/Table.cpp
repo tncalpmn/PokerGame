@@ -229,6 +229,7 @@ void Table::startRound(){
     for(User &usr : allUsers){
         usr.setRandomCards(currentRound);
         usr.initCurrentRoundMoney();
+        usr.getPlayerInfo();
     }
     
     putBlindsMoney();
@@ -236,7 +237,7 @@ void Table::startRound(){
     whoseTurn = roundTurn(bigBlindId + 1);
     
     bool roundDone = false;
-    toEven = bigBlindAmount;
+    toEven = BIG_BLIND;
     int turn = 0;
     
     cout << "---------------- First Turn of the Round Starts ---------------- " <<endl;
@@ -301,7 +302,6 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
     map<int,vector<Card>>::iterator it;
     
     for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){ // iterate through all users
-        // 1 (A) Card must be checked specially
     
         Decider decisionMaker(it->second);
         
@@ -332,12 +332,15 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
         else if(decisionMaker.is1Pair()){           // One Pair
             allUsers[(it->first)-1].addRank(15);
         }
-        else{                           // High Card      usr.addRank(max(usr.getCards()[0],usr.getCards()[1]))
-        
+        else{                           // High Card
+            allUsers[(it->first)-1].addRank(max(allUsers[(it->first)-1].getCards()[0].getNumber(), allUsers[(it->first)-1].getCards()[1].getNumber()));
+            // TODO if high card in deck is bigger than tie
         }                               //if(usr.getCards()[0 or 1]== 1 (A) then) rank += 14
+    
+        cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << endl;
     }
     
-    // TODO if two user have same rank check hands higest card it belongs to USer then rand++ otherwise tie
+    // TODO if two user have same rank check hands higest card it belongs to USer then rank++ otherwise tie
     
 }
 
@@ -397,15 +400,15 @@ void Table::putCardsOnTheTable(){
 }
 
 void Table::putBlindsMoney(){
-    moneyOnTable.addChips(amountToChipConverter(smallBlindAmount + bigBlindAmount, Chips(0,0,0,0,0,0))); // TODO If remove from aser is Successfull then add chips
+    moneyOnTable.addChips(amountToChipConverter(SMALL_BLIND + BIG_BLIND, Chips(0,0,0,0,0,0))); // TODO If remove from aser is Successfull then add chips
     for(User usr : allUsers){
         if(usr.getId()==smallBlindId){
-            removeAmountAsChips(smallBlindAmount, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
-            usr.addCurrentRoundMoney(smallBlindAmount);
+            removeAmountAsChips(SMALL_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
+            usr.addCurrentRoundMoney(SMALL_BLIND);
             allUsers[smallBlindId-1] = usr;
         }else if(usr.getId()== bigBlindId){
-            removeAmountAsChips(bigBlindAmount, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
-            usr.addCurrentRoundMoney(bigBlindAmount);
+            removeAmountAsChips(BIG_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
+            usr.addCurrentRoundMoney(BIG_BLIND);
             allUsers[bigBlindId-1] = usr;
         }
     }

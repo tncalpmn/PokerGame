@@ -21,7 +21,9 @@ class Debugger {
     void testFunction_removeAmountAsChips();
     void testFunction_amountToChipConverter();
     void testClass_Decider();
+    void testFunction_payTheWinner();
     Table testTable;
+    void clearAndfillVectorWith7Cards(vector<Card>&,Card, Card, Card, Card, Card, Card, Card);
     
 public:
     Debugger();

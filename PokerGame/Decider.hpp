@@ -42,7 +42,6 @@ public:
     
     
     Decider(vector<Card>);
-    Decider();
 };
 
 

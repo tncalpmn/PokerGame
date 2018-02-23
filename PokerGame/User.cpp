@@ -108,6 +108,13 @@ Card* User::getCards(){
     
 }
 
+void User::setCards(Card card1, Card card2){ // ONLY FOR DEBUGGING!!!!
+    
+    this->cards[0] = card1;
+    this->cards[1] = card2;
+    
+}
+
 void User::setRandomCards(Round &curRnd){
     
     int seed = static_cast<int>(time(0)); // Seed for Random Number Generator
@@ -118,6 +125,7 @@ void User::setRandomCards(Round &curRnd){
         this->cards[i] = curRnd.deck[randNum];
         curRnd.deck.erase(curRnd.deck.begin() + randNum);
     }
+    
 }
 
 void User::getPlayerInfo(){

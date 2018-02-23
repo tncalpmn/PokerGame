@@ -27,7 +27,6 @@ private:
     void setBlinds();
     int roundTurn(int);
     void initAllUserDecisions();
-    void payTheWinner();
 public:
     //Variables
     Round currentRound;
@@ -35,6 +34,7 @@ public:
     void startRound();
     int totalNumberofPlayer;
     std::vector<User> allUsers;
+    vector<Card> cardsOnTheTable;
     void putBlindsMoney();
     void putCardsOnTheTable();
     //Functions
@@ -43,6 +43,7 @@ public:
     bool removeAmountAsChips(int,Chips&,Chips);
     Chips& changeNextAvailableCoinsToOnes(Chips&);
     Chips amountToChipConverter(int, Chips);
+    void payTheWinner();
 };
 
 
