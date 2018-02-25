@@ -23,6 +23,9 @@ vector<Card> cardsOnTheTable;
 int whoseTurn;
 int toEven;
 
+int getConsecutiveHighCard(Card, Card);
+
+
 void Table::createTable(){
     cout << "- Table is being created..." << endl;
     createRound();
@@ -305,44 +308,64 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
     
         Decider decisionMaker(it->second);
         
-        if(decisionMaker.isRoyalFlush()){           // Royal Flush
-            allUsers[(it->first)-1].addRank(23);
+        if(decisionMaker.isRoyalFlush()){           // Royal Flush (DONE)
+            allUsers[(it->first)-1].addRank(450);
         }
-        else if(decisionMaker.isStraightFlush()){   // Straight Flush
-             allUsers[(it->first)-1].addRank(22);
+        else if(decisionMaker.isStraightFlush()){   // Straight Flush (DONE)
+            allUsers[(it->first)-1].addRank(400);
+            sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers);
+            allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
+                                                                   decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
         else if(decisionMaker.is4ofaKind()){        // 4 of a Kind
-            allUsers[(it->first)-1].addRank(21);
+            allUsers[(it->first)-1].addRank(350);
         }
         else if(decisionMaker.isFullHouse()){       // Full House
-            allUsers[(it->first)-1].addRank(20);
+            allUsers[(it->first)-1].addRank(300);
         }
         else if(decisionMaker.isFlush()){           // Flush
-            allUsers[(it->first)-1].addRank(19);
+            allUsers[(it->first)-1].addRank(250);
         }
-        else if(decisionMaker.isStraight()){        // Straight
-            allUsers[(it->first)-1].addRank(18);
+        else if(decisionMaker.isStraight()){        // Straight (DONE)
+            allUsers[(it->first)-1].addRank(200);
+            sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers);
+            allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
+                                                                   decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
         else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind
-            allUsers[(it->first)-1].addRank(17);
+            allUsers[(it->first)-1].addRank(150);
         }
         else if(decisionMaker.is2Pair()){           // Two Pair
-            allUsers[(it->first)-1].addRank(16);
+            allUsers[(it->first)-1].addRank(100);
         }
         else if(decisionMaker.is1Pair()){           // One Pair
-            allUsers[(it->first)-1].addRank(15);
+            allUsers[(it->first)-1].addRank(50);
         }
         else{                           // High Card
             allUsers[(it->first)-1].addRank(max(allUsers[(it->first)-1].getCards()[0].getNumber(), allUsers[(it->first)-1].getCards()[1].getNumber()));
             // TODO if high card in deck is bigger than tie
         }                               //if(usr.getCards()[0 or 1]== 1 (A) then) rank += 14
     
-        cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << endl;
+        cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << " Highest Combination: " << endl;
+        for(Card crd : decisionMaker.highestCombination){
+            
+            crd.getCardInfo();
+            
+        }
     }
     
     // TODO if two user have same rank check hands higest card it belongs to USer then rank++ otherwise tie
     
 }
+
+int getConsecutiveHighCard(Card front, Card back){
+    if(front.getNumber() == 1 && back.getNumber() == 13){
+        return front.getValue();
+    }else{
+        return back.getValue();
+    }
+}
+
 
 void Table::initAllUserDecisions(){
 

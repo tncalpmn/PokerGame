@@ -7,16 +7,10 @@
 //
 
 #include "Decider.hpp"
+#include <algorithm>
 
 
 using namespace std;
-
-bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
-bool sortNumeric (int first,int second) { return (first < second);}
-bool sortSuits (Card first,Card second) { return (first.getSuit() < second.getSuit());}
-int max (int first,int second) {if(first > second) return first; else return second;}
-bool containsNumber(vector<int> vec, int num ){return find(vec.begin(), vec.end(), num) != vec.end();}
-
 
 Decider::Decider(vector<Card> all7Cards){
     this->all7Cards = all7Cards;
@@ -25,7 +19,7 @@ Decider::Decider(vector<Card> all7Cards){
     atLeastFiveSuits = atLeastFiveSuit();
 }
 
-bool Decider::isRoyalFlush(){ // Ex: (S_10, S_11, S_12, S_13, S_1, C_1, C_11)
+bool Decider::isRoyalFlush(){
     
     bool isRF = false;
     char atLFiveSuit = atLeastFiveSuit();
@@ -109,36 +103,50 @@ char Decider::atLeastFiveSuit(){
     return atLeastFiveSuits;
 }
 
-bool Decider::isConsecutive(vector<int> lisOfCards){
+bool Decider::isConsecutive(vector<Card> listOfCards){
     
     bool isConsecutive = false;
+
+    vector<Card> tableCards (listOfCards.size());
+    auto it = copy_if(listOfCards.begin(), listOfCards.end(), tableCards.begin(), [](Card crd){return !(crd.isThisUsersCard());});
     
-    sort(lisOfCards.begin(), lisOfCards.end(), sortNumeric);
+    tableCards.resize(distance(tableCards.begin(),it));
     
-    if(containsNumber(lisOfCards, 1)  &&
-       containsNumber(lisOfCards, 13) &&
-       containsNumber(lisOfCards, 12) &&
-       containsNumber(lisOfCards, 11) &&
-       containsNumber(lisOfCards, 10)){
-        
+    sort(listOfCards.begin(), listOfCards.end(), sortNumbers);
+    
+    if(containsCard(listOfCards, Card('n',1), false)  && // n (Suits)  here is not important because function with false parameter compare only Numbers
+       containsCard(listOfCards, Card('n',13), false) &&
+       containsCard(listOfCards, Card('n',12), false) &&
+       containsCard(listOfCards, Card('n',11), false) &&
+       containsCard(listOfCards, Card('n',10), false)){
+   
+        for(Card crd : listOfCards){
+            if((crd.isEqual(Card('n',1), false)||crd.isEqual(Card('n',13), false)||crd.isEqual(Card('n',12), false)||crd.isEqual(Card('n',11), false)|| crd.isEqual(Card('n',10), false)) /* && !(crd.isThisUsersCard() && containsCard(tableCards,crd,false))*/)
+            highestCombination.push_back(crd);
+        }
+       
         isConsecutive = true;
     }else{
         int counter = 0;
-        for(int num : lisOfCards){
+        for(Card crd : listOfCards){
             if(counter == 3){ // Sorted List therefore check first 3 Cards only
                 break;
-            }else if(containsNumber(lisOfCards,num +1 )  &&
-                     containsNumber(lisOfCards, num + 2) &&
-                     containsNumber(lisOfCards, num + 3) &&
-                     containsNumber(lisOfCards, num + 4))
+            }else if(containsCard(listOfCards, Card('n',crd.getNumber() + 1), false)  &&
+                     containsCard(listOfCards, Card('n',crd.getNumber() + 2), false)  &&
+                     containsCard(listOfCards, Card('n',crd.getNumber() + 3), false)  &&
+                     containsCard(listOfCards, Card('n',crd.getNumber() + 4), false) )
             {
+                highestCombination.clear();
+                for(Card card : listOfCards){
+                    if((card.isEqual(Card('n',crd.getNumber()), false)||card.isEqual(Card('n',crd.getNumber() + 1), false)||card.isEqual(Card('n',crd.getNumber() + 2), false)||card.isEqual(Card('n',crd.getNumber() + 3), false)|| card.isEqual(Card('n',crd.getNumber() + 4), false)) /*&& !(card.isThisUsersCard() && containsCard(tableCards,card,false))*/)
+
+                        highestCombination.push_back(card);
+                }
                 isConsecutive = true;
-                break;
             }
             counter++;
         }
     }
-    
     return isConsecutive;
 }
 
@@ -147,10 +155,10 @@ bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO 
     bool isSF = false;
     
     if(atLeastFiveSuits != 'n'){
-        vector<int> suitFilteredCardNumbers;
+        vector<Card> suitFilteredCardNumbers;
         for(Card crd : all7Cards){
             if(crd.getSuit() == atLeastFiveSuits){
-                suitFilteredCardNumbers.push_back(crd.getNumber());
+                suitFilteredCardNumbers.push_back(crd);
             }
         }
         isSF = isConsecutive(suitFilteredCardNumbers);
@@ -202,12 +210,7 @@ bool Decider::isFlush(){
 
 bool Decider::isStraight(){
     
-    vector<int> cardNumbers;
-    for(Card crd : all7Cards){
-        cardNumbers.push_back(crd.getNumber());
-    }
-    
-    return isConsecutive(cardNumbers);
+    return isConsecutive(all7Cards);
 }
 
 bool Decider::is3ofaKind(){
