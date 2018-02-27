@@ -260,14 +260,28 @@ bool Decider::isFullHouse(){
                 counter++;
             }
         }
-        sort(highestCombination.begin(), highestCombination.end(), sortNumbers);
     }
 
     return isFH;
 }
 
 bool Decider::isFlush(){
-    return (atLeastFiveSuits != 'n') ?  true : false;
+    
+    bool isFL = (atLeastFiveSuits != 'n') ?  true : false;
+    
+    sort(all7Cards.begin(), all7Cards.end(), sortByValue);
+
+    int8_t counter = 0;
+    if(isFL){
+        for(Card crd : all7Cards){
+            if(crd.getSuit() == atLeastFiveSuits && counter < 5){
+                highestCombination.push_back(crd);
+                counter++;
+            }
+        }
+    }
+    
+    return isFL;
 }
 
 bool Decider::isStraight(){

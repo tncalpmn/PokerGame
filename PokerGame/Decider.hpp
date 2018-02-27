@@ -43,6 +43,7 @@ public:
     map<Card,int> groupCardsWithNums(vector<Card>);
     
     static bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
+    static bool sortByValue (Card first,Card second) { return (first.getValue() > second.getValue());} // bigger to smaller
     static bool sortNumeric (int first,int second) { return (first < second);}
     static bool sortSuits (Card first,Card second) { return (first.getSuit() < second.getSuit());}
     static int max (int first,int second) {if(first > second) return first; else return second;}

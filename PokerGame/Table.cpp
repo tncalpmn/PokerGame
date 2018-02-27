@@ -322,15 +322,16 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
             allUsers[(it->first)-1].addRank(7000);
             allUsers[(it->first)-1].addRank(sumHighComb(decisionMaker.highestCombination));
         }
-        else if(decisionMaker.isFullHouse()){       // Full House
+        else if(decisionMaker.isFullHouse()){       // Full House (DONE)
             allUsers[(it->first)-1].addRank(6000);
             map<Card, int> twosAndThrees = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
             for(pair<Card,int> each : twosAndThrees){
                 allUsers[(it->first)-1].addRank(each.second == 3 ? 15 * each.first.getValue() : each.first.getValue() ); // 15 is here weight given for threes
             }
         }
-        else if(decisionMaker.isFlush()){           // Flush
+        else if(decisionMaker.isFlush()){           // Flush (DONE)
             allUsers[(it->first)-1].addRank(5000);
+            allUsers[(it->first)-1].addRank(decisionMaker.highestCombination.front().getValue());
         }
         else if(decisionMaker.isStraight()){        // Straight (DONE)
             allUsers[(it->first)-1].addRank(4000);
