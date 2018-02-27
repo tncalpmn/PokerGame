@@ -15,7 +15,7 @@ using namespace std;
 Decider::Decider(vector<Card> all7Cards){
     this->all7Cards = all7Cards;
     numbOfSuits = countSuits();
-    numbOfNumbers = countNumbers();
+    numbOfNumbers = countNumbers(all7Cards);
     atLeastFiveSuits = atLeastFiveSuit();
 }
 
@@ -75,12 +75,11 @@ map<char, int>  Decider::countSuits(){
     return suitCounts;
 }
 
-map<int, int> Decider::countNumbers(){
+map<int, int> Decider::countNumbers(vector<Card> cards){
     
     map<int, int> numberCounts;
     
-    for(Card crd : all7Cards){
-    
+    for(Card crd : cards){
         if(numberCounts.count(crd.getNumber())){
             numberCounts.insert(pair<int,int>(crd.getNumber(), numberCounts.find(crd.getNumber())->second++));
         }else {
@@ -114,14 +113,14 @@ bool Decider::isConsecutive(vector<Card> listOfCards){
     
     sort(listOfCards.begin(), listOfCards.end(), sortNumbers);
     
-    if(containsCard(listOfCards, Card('n',1), false)  && // n (Suits)  here is not important because function with false parameter compare only Numbers
+    if(containsCard(listOfCards, Card('n',1), false)  && // Suits are  here is not important because function with false parameter compare only numbers
        containsCard(listOfCards, Card('n',13), false) &&
        containsCard(listOfCards, Card('n',12), false) &&
        containsCard(listOfCards, Card('n',11), false) &&
        containsCard(listOfCards, Card('n',10), false)){
    
         for(Card crd : listOfCards){
-            if((crd.isEqual(Card('n',1), false)||crd.isEqual(Card('n',13), false)||crd.isEqual(Card('n',12), false)||crd.isEqual(Card('n',11), false)|| crd.isEqual(Card('n',10), false)) /* && !(crd.isThisUsersCard() && containsCard(tableCards,crd,false))*/)
+            if((crd.isEqual(Card('n',1), false) || crd.isEqual(Card('n',13), false) || crd.isEqual(Card('n',12), false) || crd.isEqual(Card('n',11), false) || crd.isEqual(Card('n',10), false)) && !containsCard(highestCombination, crd, false))
             highestCombination.push_back(crd);
         }
        
@@ -138,7 +137,7 @@ bool Decider::isConsecutive(vector<Card> listOfCards){
             {
                 highestCombination.clear();
                 for(Card card : listOfCards){
-                    if((card.isEqual(Card('n',crd.getNumber()), false)||card.isEqual(Card('n',crd.getNumber() + 1), false)||card.isEqual(Card('n',crd.getNumber() + 2), false)||card.isEqual(Card('n',crd.getNumber() + 3), false)|| card.isEqual(Card('n',crd.getNumber() + 4), false)) /*&& !(card.isThisUsersCard() && containsCard(tableCards,card,false))*/)
+                    if((card.isEqual(Card('n',crd.getNumber()), false) || card.isEqual(Card('n',crd.getNumber() + 1), false) || card.isEqual(Card('n',crd.getNumber() + 2), false) || card.isEqual(Card('n',crd.getNumber() + 3), false) || card.isEqual(Card('n',crd.getNumber() + 4), false)) && !containsCard(highestCombination, card, false))
 
                         highestCombination.push_back(card);
                 }
@@ -150,7 +149,7 @@ bool Decider::isConsecutive(vector<Card> listOfCards){
     return isConsecutive;
 }
 
-bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO return high Card
+bool Decider::isStraightFlush(){
     
     bool isSF = false;
     
@@ -161,46 +160,109 @@ bool Decider::isStraightFlush(){ // In case of two user have straigt flush TODO 
                 suitFilteredCardNumbers.push_back(crd);
             }
         }
+        
         isSF = isConsecutive(suitFilteredCardNumbers);
+    
     }else{
         isSF = false;
     }
     return isSF;
 }
 
-bool Decider::is4ofaKind(){ // TODO In Case of multiple User have 4 Of a Kind select high card
+bool Decider::is4ofaKind(){
     
     bool is4K = false;
+    int mutlNum = 0;
+    Card higestCard;
     
     for(pair<int,int> item : numbOfNumbers){
         if(item.second == 4){
             is4K = true;
+            mutlNum = item.first;
             break;
         }
     }
+
+    if(is4K){
+        for(Card crd : all7Cards){
+            
+            if(crd.isEqual(Card('n',mutlNum), false)){
+                highestCombination.push_back(crd);
+            }else{
+                if(crd.getValue() > higestCard.getValue()){
+                    higestCard = crd;
+                }
+            }
+        }
+        highestCombination.push_back(higestCard);
+    }
+
     return is4K;
+}
+
+
+map<Card,int> Decider::groupCardsWithNums(vector<Card> cards){
+
+    map<Card,int> group;
+
+    for(Card crd : cards){
+        if(group.count(Card('n',crd.getNumber()))){
+            group.insert(pair<Card,int>(Card('n',crd.getNumber()), group.find(Card('n',crd.getNumber()))->second++));
+        }else{
+            group.insert(pair<Card,int>(Card('n',crd.getNumber()), 1));
+        }
+    }
+    return group;
 }
 
 bool Decider::isFullHouse(){
     
     bool isFH = false;
+    
     bool checked2 = false;
     bool checked3 = false;
     
-    for(pair<int,int> item : numbOfNumbers){
+    Card threeNum;
+    Card twoNum;
+    
+    map<Card,int> groupedCards = groupCardsWithNums(all7Cards);
+
+    for(pair<Card,int> item : groupedCards){
         
         if(item.second == 3 && !checked3){
             checked3 = true;
+            threeNum = item.first;
         }else if(item.second >= 2){
             checked2 = true;
-        }
-        
-        if(checked3 && checked2){
-            isFH = true;
-            break;
+            if(item.second == 3 && (threeNum.getValue() < item.first.getValue())){
+                twoNum = threeNum;
+                threeNum = item.first;
+            }else{ // TODO get biggest Two
+                if(twoNum.getValue() < item.first.getValue()){
+                    twoNum = item.first;
+                }
+            }
         }
     }
+
+    if(checked3 && checked2){
+        isFH = true;
+    }
     
+    int8_t counter = 0;
+    
+    if(isFH){
+        for(Card crd : all7Cards){
+            if(crd.isEqual(threeNum, false)){
+                highestCombination.push_back(crd);
+            }else if(crd.isEqual(twoNum, false) && counter < 2){
+                highestCombination.push_back(crd);
+                counter++;
+            }
+        }
+        sort(highestCombination.begin(), highestCombination.end(), sortNumbers);
+    }
+
     return isFH;
 }
 

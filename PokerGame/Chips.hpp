@@ -34,7 +34,6 @@ public:
     int getTwentys();
     int getFiftys();
     int getHunderts();
-    //Chips addTwoChips(Chips);
 };
 
 #endif /* Chips_hpp */

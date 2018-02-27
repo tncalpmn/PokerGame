@@ -36,21 +36,21 @@ void Debugger::testFunction_payTheWinner(){
     
     // suit s,c,d,h
     // Manuel Fill of Cards on the Table and User Cards
-    testTable.cardsOnTheTable.push_back(Card('c',8));
+    testTable.cardsOnTheTable.push_back(Card('c',3));
     testTable.cardsOnTheTable.push_back(Card('h',2));
     testTable.cardsOnTheTable.push_back(Card('d',3));
-    testTable.cardsOnTheTable.push_back(Card('s',5));
-    testTable.cardsOnTheTable.push_back(Card('h',4));
+    testTable.cardsOnTheTable.push_back(Card('s',4));
+    testTable.cardsOnTheTable.push_back(Card('h',3));
     
     User testUser1;
     testUser1.setId(1);
     testUser1.setName("Test User 1");
-    testUser1.setCards(Card('h',1,true), Card('h',9,true));
+    testUser1.setCards(Card('s',9,true), Card('h',2,true));
     
     User testUser2;
     testUser2.setId(2);
     testUser2.setName("Test User 2");
-    testUser2.setCards(Card('h',9,true), Card('s',6,true));
+    testUser2.setCards(Card('h',1,true), Card('d',1,true));
     
     testTable.allUsers.push_back(testUser1);
     testTable.allUsers.push_back(testUser2);

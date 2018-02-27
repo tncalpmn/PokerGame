@@ -30,6 +30,13 @@ public:
     bool isThisUsersCard();
     void setAsUsersCard();
     
+    bool operator<(const Card& crd) const // This operator overload is necesaary in order to store this object in a Map, in other way we define a sort condition
+    {
+        if (crd.number < this->number)
+            return true;
+        else
+            return false;
+    }
     
 };
 

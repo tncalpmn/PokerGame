@@ -28,24 +28,6 @@ Chips::Chips(int one, int five, int ten, int twenty, int fifty, int hundert){
     this->hundert = hundert;
 }
 
-//void Chips::addChips(int one, int five, int ten, int twenty, int fifty, int hundert){
-//    this->one = this->one  + (one);
-//    this->five = this->five+ (five);
-//    this->ten = this->ten + (ten);
-//    this->twenty = this->twenty+ (twenty);
-//    this->fifty = this->fifty + (fifty);
-//    this->hundert = this->hundert + (hundert);
-//}
-//
-//void Chips::removeChips(int one, int five, int ten, int twenty, int fifty, int hundert){
-//    this->one = this->one  - (one);
-//    this->five = this->five - (five);
-//    this->ten = this->ten - (ten);
-//    this->twenty = this->twenty - (twenty);
-//    this->fifty = this->fifty - (fifty);
-//    this->hundert = this->hundert - (hundert);    
-//}
-
 void Chips::addChips(Chips chipsToAdd){
     this->one = this->one  + (chipsToAdd.one);
     this->five = this->five+ (chipsToAdd.five);
@@ -93,10 +75,6 @@ void Chips::resetChips(){
     this->hundert = 0;
     
 }
-
-//Chips Chips::addTwoChips(Chips toAdd){
-//    return Chips(this->one + toAdd.getOnes(), this->five + toAdd.getFives(), this->ten + toAdd.getTens(), this->twenty + toAdd.getTwentys(), this->fifty + toAdd.getFiftys(), this->hundert + toAdd.getHunderts());
-//}
 
 int Chips::sumOfChips(){
 

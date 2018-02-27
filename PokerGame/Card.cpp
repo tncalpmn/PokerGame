@@ -16,6 +16,7 @@ Card::Card(){
     this->number  = -1;
     this->suit = 'n';
     this->isUsersCard = false;
+    this->value = 0;
 }
 
 Card::Card(char suit, int number){
@@ -68,3 +69,4 @@ bool Card::isThisUsersCard(){
 void Card::setAsUsersCard(){
     this->isUsersCard = true;
 }
+

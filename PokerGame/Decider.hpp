@@ -26,7 +26,6 @@ private:
     map<int, int> numbOfNumbers;
     char atLeastFiveSuit();
     char atLeastFiveSuits = 'n';
-    map<int, int>  countNumbers();
     bool isConsecutive(vector<Card>);
 
 public:
@@ -40,6 +39,8 @@ public:
     bool is2Pair();
     bool is1Pair();
     vector<Card> highestCombination;
+    map<int, int>  countNumbers(vector<Card>);
+    map<Card,int> groupCardsWithNums(vector<Card>);
     
     static bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
     static bool sortNumeric (int first,int second) { return (first < second);}

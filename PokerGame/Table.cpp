@@ -24,6 +24,7 @@ int whoseTurn;
 int toEven;
 
 int getConsecutiveHighCard(Card, Card);
+int sumHighComb(vector<Card>);
 
 
 void Table::createTable(){
@@ -309,37 +310,42 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
         Decider decisionMaker(it->second);
         
         if(decisionMaker.isRoyalFlush()){           // Royal Flush (DONE)
-            allUsers[(it->first)-1].addRank(450);
+            allUsers[(it->first)-1].addRank(9000);
         }
         else if(decisionMaker.isStraightFlush()){   // Straight Flush (DONE)
-            allUsers[(it->first)-1].addRank(400);
-            sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers);
+            allUsers[(it->first)-1].addRank(8000);
+            //sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers); Not Necessary
             allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
                                                                    decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
-        else if(decisionMaker.is4ofaKind()){        // 4 of a Kind
-            allUsers[(it->first)-1].addRank(350);
+        else if(decisionMaker.is4ofaKind()){        // 4 of a Kind (DONE)
+            allUsers[(it->first)-1].addRank(7000);
+            allUsers[(it->first)-1].addRank(sumHighComb(decisionMaker.highestCombination));
         }
         else if(decisionMaker.isFullHouse()){       // Full House
-            allUsers[(it->first)-1].addRank(300);
+            allUsers[(it->first)-1].addRank(6000);
+            map<Card, int> twosAndThrees = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+            for(pair<Card,int> each : twosAndThrees){
+                allUsers[(it->first)-1].addRank(each.second == 3 ? 15 * each.first.getValue() : each.first.getValue() ); // 15 is here weight given for threes
+            }
         }
         else if(decisionMaker.isFlush()){           // Flush
-            allUsers[(it->first)-1].addRank(250);
+            allUsers[(it->first)-1].addRank(5000);
         }
         else if(decisionMaker.isStraight()){        // Straight (DONE)
-            allUsers[(it->first)-1].addRank(200);
+            allUsers[(it->first)-1].addRank(4000);
             sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers);
             allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
                                                                    decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
         else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind
-            allUsers[(it->first)-1].addRank(150);
+            allUsers[(it->first)-1].addRank(3000);
         }
         else if(decisionMaker.is2Pair()){           // Two Pair
-            allUsers[(it->first)-1].addRank(100);
+            allUsers[(it->first)-1].addRank(2000);
         }
         else if(decisionMaker.is1Pair()){           // One Pair
-            allUsers[(it->first)-1].addRank(50);
+            allUsers[(it->first)-1].addRank(1000);
         }
         else{                           // High Card
             allUsers[(it->first)-1].addRank(max(allUsers[(it->first)-1].getCards()[0].getNumber(), allUsers[(it->first)-1].getCards()[1].getNumber()));
@@ -364,6 +370,22 @@ int getConsecutiveHighCard(Card front, Card back){
     }else{
         return back.getValue();
     }
+}
+
+int sumHighComb(vector<Card> higCom){
+   
+    int sum = 0;
+    int8_t counter = 0; // TODO Change All int counters to int8 if possible
+    for(Card crd : higCom){
+        
+        if(counter < 4)
+            sum = sum + (crd.getValue() * 15); // 15 is here weight, to give more value to 4 of a kind Cards
+        else
+            sum = sum + crd.getValue();
+        counter++;
+    }
+    
+    return sum;
 }
 
 
@@ -423,7 +445,7 @@ void Table::putCardsOnTheTable(){
 }
 
 void Table::putBlindsMoney(){
-    moneyOnTable.addChips(amountToChipConverter(SMALL_BLIND + BIG_BLIND, Chips(0,0,0,0,0,0))); // TODO If remove from aser is Successfull then add chips
+    moneyOnTable.addChips(amountToChipConverter(SMALL_BLIND + BIG_BLIND, Chips(0,0,0,0,0,0))); // TODO If remove from user is Successfull then add chips
     for(User usr : allUsers){
         if(usr.getId()==smallBlindId){
             removeAmountAsChips(SMALL_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull

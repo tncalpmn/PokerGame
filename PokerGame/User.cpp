@@ -45,7 +45,7 @@ int User::getRank(){
     return this->rank;
 }
 
-void User::addRank(int rank){
+void User::addRank(int rank){ // TODO Rank smaller datatype 
     
     this->rank = this->rank + rank;
     
