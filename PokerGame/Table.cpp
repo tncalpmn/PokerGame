@@ -83,7 +83,7 @@ int Table::roundTurn(int turn){
     }
 }
 
-bool Table::removeAmountAsChips(int amount, Chips &availableAmount, Chips init){
+bool Table::removeAmountAsChips(int amount, Chips &availableAmount, Chips init){ // TODO Converter Class
   
     bool wasRemoveSuccesful = true;
     
@@ -307,7 +307,7 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
     
     for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){ // iterate through all users
     
-        Decider decisionMaker(it->second);
+        Decider decisionMaker(it->second); // All this function can go into Decider give User&
         
         if(decisionMaker.isRoyalFlush()){           // Royal Flush (DONE)
             allUsers[(it->first)-1].addRank(9000);
@@ -339,8 +339,12 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
             allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
                                                                    decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
-        else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind
+        else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind (DONE)
             allUsers[(it->first)-1].addRank(3000);
+            map<Card, int> threesAnd2Highs = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+            for(pair<Card,int> each : threesAnd2Highs){
+                allUsers[(it->first)-1].addRank(each.second == 3 ? 15 * each.first.getValue() : each.first.getValue() ); // 15 is here weight given for threes
+            }
         }
         else if(decisionMaker.is2Pair()){           // Two Pair
             allUsers[(it->first)-1].addRank(2000);

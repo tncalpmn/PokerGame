@@ -9,7 +9,6 @@
 #include "Decider.hpp"
 #include <algorithm>
 
-
 using namespace std;
 
 Decider::Decider(vector<Card> all7Cards){
@@ -237,7 +236,7 @@ bool Decider::isFullHouse(){
             if(item.second == 3 && (threeNum.getValue() < item.first.getValue())){
                 twoNum = threeNum;
                 threeNum = item.first;
-            }else{ // TODO get biggest Two
+            }else{ // get biggest Two
                 if(twoNum.getValue() < item.first.getValue()){
                     twoNum = item.first;
                 }
@@ -292,13 +291,41 @@ bool Decider::isStraight(){
 bool Decider::is3ofaKind(){
     
     bool is3K = false;
+    Card max3;
+    Card maxH1;
+    Card maxH2;
+    map<Card,int> groupedCards = groupCardsWithNums(all7Cards);
+
+    //sort(all7Cards.begin(), all7Cards.end(), sortByValue);
     
-    for(pair<int,int> item : numbOfNumbers){
+    for(pair<Card,int> item : groupedCards){
         if(item.second == 3){
             is3K = true;
-            break;
+            if(item.first.getValue() > max3.getValue()){
+                max3 = item.first;
+            }
+        }else{
+        
+            if(item.first.getValue() > maxH1.getValue() || item.first.getValue() > maxH2.getValue()){
+                if(item.first.getValue() > maxH1.getValue()){
+                    maxH2 = maxH1;
+                    maxH1 = item.first;
+                }
+                if(item.first.getValue() > maxH2.getValue() && item.first.getValue() < maxH1.getValue()){
+                    maxH2 = item.first;
+                }
+            }
         }
     }
+    
+    if(is3K){
+        for(Card crd: all7Cards){
+            if(crd.isEqual(max3, false) || crd.isEqual(maxH1, false) || crd.isEqual(maxH2, false)  ){
+                highestCombination.push_back(crd);
+            }
+        }
+    }
+    
     return is3K;
 }
 
