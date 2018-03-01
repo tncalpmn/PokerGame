@@ -12,6 +12,7 @@
 using namespace std;
 
 Decider::Decider(vector<Card> all7Cards){
+    sort(all7Cards.begin(), all7Cards.end(), sortByValue);
     this->all7Cards = all7Cards;
     numbOfSuits = countSuits();
     numbOfNumbers = countNumbers(all7Cards);
@@ -105,11 +106,6 @@ bool Decider::isConsecutive(vector<Card> listOfCards){
     
     bool isConsecutive = false;
 
-    vector<Card> tableCards (listOfCards.size());
-    auto it = copy_if(listOfCards.begin(), listOfCards.end(), tableCards.begin(), [](Card crd){return !(crd.isThisUsersCard());});
-    
-    tableCards.resize(distance(tableCards.begin(),it));
-    
     sort(listOfCards.begin(), listOfCards.end(), sortNumbers);
     
     if(containsCard(listOfCards, Card('n',1), false)  && // Suits are  here is not important because function with false parameter compare only numbers
@@ -268,11 +264,9 @@ bool Decider::isFlush(){
     
     bool isFL = (atLeastFiveSuits != 'n') ?  true : false;
     
-    sort(all7Cards.begin(), all7Cards.end(), sortByValue);
-
     int8_t counter = 0;
     if(isFL){
-        for(Card crd : all7Cards){
+        for(Card crd : all7Cards){ // SORTED LIST
             if(crd.getSuit() == atLeastFiveSuits && counter < 5){
                 highestCombination.push_back(crd);
                 counter++;
@@ -368,18 +362,37 @@ bool Decider::is2Pair(){
         }
     }
     
-    
     return is2P;
 }
 
 bool Decider::is1Pair(){
     bool is1P = false;
+    Card onePair;
     
-    for(pair<int,int> item : numbOfNumbers){
+    for(pair<Card,int> item : groupCardsWithNums(all7Cards)){
         if(item.second == 2){
             is1P = true;
+            onePair = item.first;
             break;
         }
     }
+    
+    int8_t counter = 0;
+    
+    if(is1P){
+        for(Card crd: all7Cards){ // SORTED LIST
+            if(crd.isEqual(onePair, false)){
+                highestCombination.push_back(crd);
+            }else if(counter < 3){
+                highestCombination.push_back(crd);
+                counter++;
+            }
+        }
+    }
+
     return is1P;
+}
+
+vector<Card> Decider::getAll7Cards(){
+    return all7Cards;
 }

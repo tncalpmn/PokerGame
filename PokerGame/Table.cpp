@@ -354,19 +354,20 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
                 allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
             }
         }
-        else if(decisionMaker.is1Pair()){           // One Pair
+        else if(decisionMaker.is1Pair()){           // One Pair (DONE)
             allUsers[(it->first)-1].addRank(1000);
+            map<Card, int> onePairAndRest = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+            for(pair<Card,int> each : onePairAndRest){
+                allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+            }
         }
-        else{                           // High Card
-            allUsers[(it->first)-1].addRank(max(allUsers[(it->first)-1].getCards()[0].getNumber(), allUsers[(it->first)-1].getCards()[1].getNumber()));
-            // TODO if high card in deck is bigger than tie
-        }                               //if(usr.getCards()[0 or 1]== 1 (A) then) rank += 14
+        else{                                       // High Card
+            allUsers[(it->first)-1].addRank(decisionMaker.getAll7Cards().front().getValue()); // SORTED LIST
+        }
     
         cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << " Highest Combination: " << endl;
         for(Card crd : decisionMaker.highestCombination){
-            
             crd.getCardInfo();
-            
         }
     }
     

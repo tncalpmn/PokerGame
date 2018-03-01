@@ -41,6 +41,7 @@ public:
     vector<Card> highestCombination;
     map<int, int>  countNumbers(vector<Card>);
     map<Card,int> groupCardsWithNums(vector<Card>);
+    vector<Card> getAll7Cards();
     
     static bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
     static bool sortByValue (Card first,Card second) { return (first.getValue() > second.getValue());} // bigger to smaller

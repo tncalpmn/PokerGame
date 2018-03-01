@@ -109,10 +109,10 @@ Card* User::getCards(){
 }
 
 void User::setCards(Card card1, Card card2){ // ONLY FOR DEBUGGING!!!!
-    
+
     this->cards[0] = card1;
     this->cards[1] = card2;
-    
+
 }
 
 void User::setRandomCards(Round &curRnd){
@@ -123,7 +123,6 @@ void User::setRandomCards(Round &curRnd){
     for(int i = 0;i<2;i++){
         int randNum = (rand() % (curRnd.deck.size() + 1));
         this->cards[i] = curRnd.deck[randNum];
-        this->cards[i].setAsUsersCard();
         curRnd.deck.erase(curRnd.deck.begin() + randNum);
     }
     

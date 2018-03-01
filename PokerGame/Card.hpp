@@ -16,7 +16,6 @@ private:
     int number;
     char suit;
     int value;
-    bool isUsersCard;
     
 public:
     void getCardInfo();
@@ -27,8 +26,6 @@ public:
     int getValue();
     char getSuit();
     bool isEqual(Card,bool);
-    bool isThisUsersCard();
-    void setAsUsersCard();
     
     bool operator<(const Card& crd) const // This operator overload is necesaary in order to store this object in a Map, in other way we define a sort condition
     {
