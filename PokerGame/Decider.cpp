@@ -295,17 +295,12 @@ bool Decider::is3ofaKind(){
     Card maxH1;
     Card maxH2;
     map<Card,int> groupedCards = groupCardsWithNums(all7Cards);
-
-    //sort(all7Cards.begin(), all7Cards.end(), sortByValue);
     
     for(pair<Card,int> item : groupedCards){
         if(item.second == 3){
             is3K = true;
-            if(item.first.getValue() > max3.getValue()){
-                max3 = item.first;
-            }
+            max3 = item.first;
         }else{
-        
             if(item.first.getValue() > maxH1.getValue() || item.first.getValue() > maxH2.getValue()){
                 if(item.first.getValue() > maxH1.getValue()){
                     maxH2 = maxH1;
@@ -333,15 +328,47 @@ bool Decider::is2Pair(){
     bool is2P = false;
     int counter = 0;
     
-    for(pair<int,int> item : numbOfNumbers){
+    Card highTwo1;
+    Card highTwo2;
+    Card highCrd;
+    
+    map<Card,int> groupedCards = groupCardsWithNums(all7Cards);
+    
+    for(pair<Card,int> item : groupedCards){
         if(item.second == 2){
+            if(item.first.getValue() > highTwo1.getValue() || item.first.getValue() > highTwo2.getValue()){
+                if(item.first.getValue() > highTwo1.getValue()){
+                    highTwo2 = highTwo1;
+                    highTwo1 = item.first;
+                }
+                if(item.first.getValue() > highTwo2.getValue() && item.first.getValue() < highTwo1.getValue()){
+                    highTwo2 = item.first;
+                }
+            }
             counter++;
         }
         if(counter == 2){
             is2P = true;
-            break;
         }
     }
+    
+    for(pair<Card,int> item : groupedCards){
+        if(item.first.getValue() > highCrd.getValue() && !(item.first.isEqual(highTwo1, false))  && !(item.first.isEqual(highTwo2, false))){
+            highCrd = item.first;
+        }
+    }
+
+    if(is2P){
+        for(Card crd: all7Cards){
+            if(crd.isEqual(highTwo1, false) || crd.isEqual(highTwo2, false)){
+                highestCombination.push_back(crd);
+            }else if(crd.isEqual(highCrd, false) && !containsCard(highestCombination, highCrd, false) ){
+                highestCombination.push_back(crd);
+            }
+        }
+    }
+    
+    
     return is2P;
 }
 

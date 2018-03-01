@@ -314,19 +314,21 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
         }
         else if(decisionMaker.isStraightFlush()){   // Straight Flush (DONE)
             allUsers[(it->first)-1].addRank(8000);
-            //sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers); Not Necessary
             allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
                                                                    decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
         else if(decisionMaker.is4ofaKind()){        // 4 of a Kind (DONE)
             allUsers[(it->first)-1].addRank(7000);
-            allUsers[(it->first)-1].addRank(sumHighComb(decisionMaker.highestCombination));
+            map<Card, int> fourAndOne = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+            for(pair<Card,int> each : fourAndOne){
+                allUsers[(it->first)-1].addRank(each.second == 4 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+            }
         }
         else if(decisionMaker.isFullHouse()){       // Full House (DONE)
             allUsers[(it->first)-1].addRank(6000);
             map<Card, int> twosAndThrees = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
             for(pair<Card,int> each : twosAndThrees){
-                allUsers[(it->first)-1].addRank(each.second == 3 ? 15 * each.first.getValue() : each.first.getValue() ); // 15 is here weight given for threes
+                allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
             }
         }
         else if(decisionMaker.isFlush()){           // Flush (DONE)
@@ -335,7 +337,6 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
         }
         else if(decisionMaker.isStraight()){        // Straight (DONE)
             allUsers[(it->first)-1].addRank(4000);
-            sort(decisionMaker.highestCombination.begin(), decisionMaker.highestCombination.end(), Decider::sortNumbers);
             allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
                                                                    decisionMaker.highestCombination.back())); // Extra Ranking for HighCard
         }
@@ -343,11 +344,15 @@ void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Curr
             allUsers[(it->first)-1].addRank(3000);
             map<Card, int> threesAnd2Highs = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
             for(pair<Card,int> each : threesAnd2Highs){
-                allUsers[(it->first)-1].addRank(each.second == 3 ? 15 * each.first.getValue() : each.first.getValue() ); // 15 is here weight given for threes
+                allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
             }
         }
-        else if(decisionMaker.is2Pair()){           // Two Pair
+        else if(decisionMaker.is2Pair()){           // Two Pair (DONE)
             allUsers[(it->first)-1].addRank(2000);
+            map<Card, int> two2And1High = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+            for(pair<Card,int> each : two2And1High){
+                allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+            }
         }
         else if(decisionMaker.is1Pair()){           // One Pair
             allUsers[(it->first)-1].addRank(1000);
@@ -384,7 +389,7 @@ int sumHighComb(vector<Card> higCom){
     for(Card crd : higCom){
         
         if(counter < 4)
-            sum = sum + (crd.getValue() * 15); // 15 is here weight, to give more value to 4 of a kind Cards
+            sum = sum + (crd.getValue() * WEIGHT);
         else
             sum = sum + crd.getValue();
         counter++;

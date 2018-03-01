@@ -13,5 +13,7 @@
 static bool isDebuggerOn = true;
 const int SMALL_BLIND = 5;
 const int BIG_BLIND = SMALL_BLIND * 2;
+const int8_t WEIGHT = 15;
+
 
 #endif /* Globals_h */
