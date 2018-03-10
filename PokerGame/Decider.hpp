@@ -42,13 +42,10 @@ public:
     map<int, int>  countNumbers(vector<Card>);
     map<Card,int> groupCardsWithNums(vector<Card>);
     vector<Card> getAll7Cards();
+    void setHighestFive();
     
     static bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
     static bool sortByValue (Card first,Card second) { return (first.getValue() > second.getValue());} // bigger to smaller
-    static bool sortNumeric (int first,int second) { return (first < second);}
-    static bool sortSuits (Card first,Card second) { return (first.getSuit() < second.getSuit());}
-    static int max (int first,int second) {if(first > second) return first; else return second;}
-    static bool containsNumber(vector<int> vec, int num ){return find(vec.begin(), vec.end(), num) != vec.end();}
     static bool containsCard(vector<Card> vec, Card crd, bool isSuitRelevant){ for(Card v : vec){ if(v.isEqual(crd,isSuitRelevant)){return true;}}return false;}
 
     Decider(vector<Card>);

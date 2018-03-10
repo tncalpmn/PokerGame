@@ -37,6 +37,7 @@ void Chips::addChips(Chips chipsToAdd){
     this->hundert = this->hundert + (chipsToAdd.hundert);
 }
 
+// This function should be used cautiously, it should be first checked if the player has enougt money to be reduced.
 void Chips::removeChips(Chips chipsToRemove){
     this->one = this->one  - (chipsToRemove.one);
     this->five = this->five - (chipsToRemove.five);
@@ -66,33 +67,18 @@ int Chips::getHunderts(){
 }
 
 void Chips::resetChips(){
-    
     this->one = 0;
     this->five = 0;
     this->ten = 0;
     this->twenty = 0;
     this->fifty = 0;
     this->hundert = 0;
-    
 }
 
 int Chips::sumOfChips(){
-
-    int sum = (1 * one) + (5 * five) + (10 * ten) + (20 * twenty) + (50 * fifty) + (100 * hundert);
-
-    return sum;
-
+    return (1 * one) + (5 * five) + (10 * ten) + (20 * twenty) + (50 * fifty) + (100 * hundert);
 }
 
 void Chips::getChipInfo(){
-
-    cout << "   + Amount of Chip One = "     << one      <<endl;
-    cout << "   + Amount of Chip Five = "    << five     <<endl;
-    cout << "   + Amount of Chip Ten = "     << ten      <<endl;
-    cout << "   + Amount of Chip Twenty = "  << twenty   <<endl;
-    cout << "   + Amount of Chip Fifty = "   << fifty    <<endl;
-    cout << "   + Amount of Chip Hundert = " << hundert  <<endl;
-    
-    cout << "   + Total Amount of Chips is: " << sumOfChips() <<endl;
-
+    cout << "ONE: "<< one << " | FIVE: "<< five << " | TEN: "<< ten << " | TWENTY: "<< twenty<< " | FIFTY: "<< fifty << " | HUNDERT: " << hundert << " = " << sumOfChips() << endl;
 }

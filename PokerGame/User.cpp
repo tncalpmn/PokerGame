@@ -14,7 +14,6 @@
 using namespace std;
 
 User::User(){
-
     this->name = "";
     this->chips = Chips(50,30,20,10,4,2);
     this->folded = false;
@@ -24,31 +23,27 @@ User::User(){
 }
 
 void User::addCurrentRoundMoney(int amount){
-    
     amoundPutOnCurrentRound = amoundPutOnCurrentRound + amount;
-    
 }
 
 void User::initCurrentRoundMoney(){
-    
     this->amoundPutOnCurrentRound = 0;
-    
+}
+
+void User::initRankings(){
+    this->rank = 0;
 }
 
 void User::setDecision(string stand){
-    
     this->decision = stand;
-    
 }
 
 int User::getRank(){
     return this->rank;
 }
 
-void User::addRank(int rank){ // TODO Rank smaller datatype 
-    
+void User::addRank(int rank){
     this->rank = this->rank + rank;
-    
 }
 
 void User::initDecisions(){
@@ -60,9 +55,7 @@ string User::getDecision(){
 }
 
 void User::setName(string name){
-
     this->name = name;
-
 }
 
 bool User::isFolded(){
@@ -78,54 +71,41 @@ string User::getName(){
 }
 
 void User::setBlind(bool small, bool big){
-    
     this->smallBlind = small;
     this->bigBlind = big;
-    
 }
 
 void User::setId(unsigned int id){
-    
     this->id = id;
-    
 }
 
 unsigned int User::getId(){
-    
     return this->id;
-    
 }
 
 Chips& User::getChips(){
-    
     return this->chips;
-    
 }
 
 Card* User::getCards(){
-    
     return this->cards;
-    
 }
 
 void User::setCards(Card card1, Card card2){ // ONLY FOR DEBUGGING!!!!
-
     this->cards[0] = card1;
     this->cards[1] = card2;
-
 }
 
 void User::setRandomCards(Round &curRnd){
-    
     int seed = static_cast<int>(time(0)); // Seed for Random Number Generator
     srand(seed);
     
-    for(int i = 0;i<2;i++){
-        int randNum = (rand() % (curRnd.deck.size() + 1));
+    for(int i = 0;i<2;i++){ // TODO This is Wrong currently Array out of boundaries CORRECT!! Check out the other random card setter
+        int randNum = (rand() % curRnd.deck.size()) + 1;
         this->cards[i] = curRnd.deck[randNum];
-        curRnd.deck.erase(curRnd.deck.begin() + randNum);
+        curRnd.deck.erase(curRnd.deck.begin() + (randNum));
     }
-    
+    cout << (curRnd.deck.size()) << endl;
 }
 
 void User::getPlayerInfo(){
@@ -135,5 +115,4 @@ void User::getPlayerInfo(){
     for(Card card : this->cards){ 
         card.getCardInfo();
     }
-    
 }

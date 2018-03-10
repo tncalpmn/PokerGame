@@ -19,6 +19,114 @@ Decider::Decider(vector<Card> all7Cards){
     atLeastFiveSuits = atLeastFiveSuit();
 }
 
+map<char, int>  Decider::countSuits(){ // Helper Function: Count Suits in all 7 Cards
+    
+    map<char, int> suitCounts;
+    
+    suitCounts.insert(pair<char,int>('s', 0));
+    suitCounts.insert(pair<char,int>('c', 0));
+    suitCounts.insert(pair<char,int>('d', 0));
+    suitCounts.insert(pair<char,int>('h', 0));
+    
+    map<char, int>::iterator it;
+    
+    for(Card singCard : all7Cards){
+        
+        for(it = suitCounts.begin();it != suitCounts.end();it++){
+            if(singCard.getSuit() == it->first){
+                it->second++;
+                break;
+            }
+        }
+    }
+    return suitCounts;
+}
+
+map<int, int> Decider::countNumbers(vector<Card> cards){ // Helper Function: Count Numbers in all 7 Cards
+    
+    map<int, int> numberCounts;
+    
+    for(Card crd : cards){
+        if(numberCounts.count(crd.getNumber())){
+            numberCounts.insert(pair<int,int>(crd.getNumber(), numberCounts.find(crd.getNumber())->second++));
+        }else {
+            numberCounts.insert(pair<int,int>(crd.getNumber(), 1));
+        }
+    }
+    
+    return numberCounts;
+}
+
+// Helper Function: Counts the amount of Suits and if there is one more than or equal to 5 then it turns that Suit otherwise return "n"  Mostly Used for Flush Cases
+char Decider::atLeastFiveSuit(){
+    map<char, int>::iterator it;
+    for(it = numbOfSuits.begin(); it != numbOfSuits.end(); it++){
+        if(it->second >= 5){
+            atLeastFiveSuits = it->first;
+        }
+    }
+    return atLeastFiveSuits;
+}
+
+bool Decider::isConsecutive(vector<Card> listOfCards){ // Helper Function: checks if at least 5 consecutive Numbers exists.
+    
+    bool isConsecutive = false;
+    
+    sort(listOfCards.begin(), listOfCards.end(), sortNumbers);
+    
+    if(containsCard(listOfCards, Card('n',1), false)  && // Suits are  here is not important because function with false parameter compare only numbers
+       containsCard(listOfCards, Card('n',13), false) &&
+       containsCard(listOfCards, Card('n',12), false) &&
+       containsCard(listOfCards, Card('n',11), false) &&
+       containsCard(listOfCards, Card('n',10), false)){
+        
+        for(Card crd : listOfCards){
+            if((crd.isEqual(Card('n',1), false) || crd.isEqual(Card('n',13), false) || crd.isEqual(Card('n',12), false) || crd.isEqual(Card('n',11), false) || crd.isEqual(Card('n',10), false)) && !containsCard(highestCombination, crd, false))
+                highestCombination.push_back(crd);
+        }
+        
+        isConsecutive = true;
+    }else{
+        int counter = 0;
+        for(Card crd : listOfCards){
+            if(counter == 3){ // SORTED LIST
+                break;
+            }else if(containsCard(listOfCards, Card('n',crd.getNumber() + 1), false)  &&
+                     containsCard(listOfCards, Card('n',crd.getNumber() + 2), false)  &&
+                     containsCard(listOfCards, Card('n',crd.getNumber() + 3), false)  &&
+                     containsCard(listOfCards, Card('n',crd.getNumber() + 4), false) )
+            {
+                highestCombination.clear();
+                for(Card card : listOfCards){
+                    if((card.isEqual(Card('n',crd.getNumber()), false) || card.isEqual(Card('n',crd.getNumber() + 1), false) || card.isEqual(Card('n',crd.getNumber() + 2), false) || card.isEqual(Card('n',crd.getNumber() + 3), false) || card.isEqual(Card('n',crd.getNumber() + 4), false)) && !containsCard(highestCombination, card, false))
+                        
+                        highestCombination.push_back(card);
+                }
+                isConsecutive = true;
+            }
+            counter++;
+        }
+    }
+    return isConsecutive;
+}
+
+map<Card,int> Decider::groupCardsWithNums(vector<Card> cards){ // Helper Function: Group 7 Cards according to their numbers and put them in map with amount
+    map<Card,int> group;
+    
+    for(Card crd : cards){
+        if(group.count(Card('n',crd.getNumber()))){
+            group.insert(pair<Card,int>(Card('n',crd.getNumber()), group.find(Card('n',crd.getNumber()))->second++));
+        }else{
+            group.insert(pair<Card,int>(Card('n',crd.getNumber()), 1));
+        }
+    }
+    return group;
+}
+
+vector<Card> Decider::getAll7Cards(){
+    return all7Cards;
+}
+
 bool Decider::isRoyalFlush(){
     
     bool isRF = false;
@@ -49,99 +157,6 @@ bool Decider::isRoyalFlush(){
         isRF = false;
     }
     return isRF;
-}
-
-map<char, int>  Decider::countSuits(){
-    
-     map<char, int> suitCounts;
-     
-     suitCounts.insert(pair<char,int>('s', 0));
-     suitCounts.insert(pair<char,int>('c', 0));
-     suitCounts.insert(pair<char,int>('d', 0));
-     suitCounts.insert(pair<char,int>('h', 0));
-     
-     map<char, int>::iterator it;
-     
-     for(Card singCard : all7Cards){
-
-         for(it = suitCounts.begin();it != suitCounts.end();it++){
-             if(singCard.getSuit() == it->first){
-                 it->second++;
-                 break;
-             }
-         }
-     }
-    
-    return suitCounts;
-}
-
-map<int, int> Decider::countNumbers(vector<Card> cards){
-    
-    map<int, int> numberCounts;
-    
-    for(Card crd : cards){
-        if(numberCounts.count(crd.getNumber())){
-            numberCounts.insert(pair<int,int>(crd.getNumber(), numberCounts.find(crd.getNumber())->second++));
-        }else {
-            numberCounts.insert(pair<int,int>(crd.getNumber(), 1));
-        }
-    }
-    
-    return numberCounts;
-}
-
-char Decider::atLeastFiveSuit(){
-    
-    map<char, int>::iterator it;
-    
-    for(it = numbOfSuits.begin(); it != numbOfSuits.end(); it++){
-        if(it->second >= 5){
-            atLeastFiveSuits = it->first;
-        }
-    }
-    return atLeastFiveSuits;
-}
-
-bool Decider::isConsecutive(vector<Card> listOfCards){
-    
-    bool isConsecutive = false;
-
-    sort(listOfCards.begin(), listOfCards.end(), sortNumbers);
-    
-    if(containsCard(listOfCards, Card('n',1), false)  && // Suits are  here is not important because function with false parameter compare only numbers
-       containsCard(listOfCards, Card('n',13), false) &&
-       containsCard(listOfCards, Card('n',12), false) &&
-       containsCard(listOfCards, Card('n',11), false) &&
-       containsCard(listOfCards, Card('n',10), false)){
-   
-        for(Card crd : listOfCards){
-            if((crd.isEqual(Card('n',1), false) || crd.isEqual(Card('n',13), false) || crd.isEqual(Card('n',12), false) || crd.isEqual(Card('n',11), false) || crd.isEqual(Card('n',10), false)) && !containsCard(highestCombination, crd, false))
-            highestCombination.push_back(crd);
-        }
-       
-        isConsecutive = true;
-    }else{
-        int counter = 0;
-        for(Card crd : listOfCards){
-            if(counter == 3){ // Sorted List therefore check first 3 Cards only
-                break;
-            }else if(containsCard(listOfCards, Card('n',crd.getNumber() + 1), false)  &&
-                     containsCard(listOfCards, Card('n',crd.getNumber() + 2), false)  &&
-                     containsCard(listOfCards, Card('n',crd.getNumber() + 3), false)  &&
-                     containsCard(listOfCards, Card('n',crd.getNumber() + 4), false) )
-            {
-                highestCombination.clear();
-                for(Card card : listOfCards){
-                    if((card.isEqual(Card('n',crd.getNumber()), false) || card.isEqual(Card('n',crd.getNumber() + 1), false) || card.isEqual(Card('n',crd.getNumber() + 2), false) || card.isEqual(Card('n',crd.getNumber() + 3), false) || card.isEqual(Card('n',crd.getNumber() + 4), false)) && !containsCard(highestCombination, card, false))
-
-                        highestCombination.push_back(card);
-                }
-                isConsecutive = true;
-            }
-            counter++;
-        }
-    }
-    return isConsecutive;
 }
 
 bool Decider::isStraightFlush(){
@@ -193,21 +208,6 @@ bool Decider::is4ofaKind(){
     }
 
     return is4K;
-}
-
-
-map<Card,int> Decider::groupCardsWithNums(vector<Card> cards){
-
-    map<Card,int> group;
-
-    for(Card crd : cards){
-        if(group.count(Card('n',crd.getNumber()))){
-            group.insert(pair<Card,int>(Card('n',crd.getNumber()), group.find(Card('n',crd.getNumber()))->second++));
-        }else{
-            group.insert(pair<Card,int>(Card('n',crd.getNumber()), 1));
-        }
-    }
-    return group;
 }
 
 bool Decider::isFullHouse(){
@@ -389,10 +389,19 @@ bool Decider::is1Pair(){
             }
         }
     }
-
     return is1P;
 }
 
-vector<Card> Decider::getAll7Cards(){
-    return all7Cards;
+void Decider::setHighestFive(){
+    
+    int8_t counter = 0;
+    
+    for(Card crd: all7Cards){
+        if(counter < 5){
+            highestCombination.push_back(crd);
+            counter++;
+        }else{
+            break;
+        }
+    }
 }

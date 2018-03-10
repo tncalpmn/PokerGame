@@ -23,7 +23,6 @@ public:
     bool folded;
     int amoundPutOnCurrentRound;
 
-    
     //Function
     User();
     void setName(string);
@@ -43,6 +42,7 @@ public:
     string getDecision();
     void initDecisions();
     void initCurrentRoundMoney();
+    void initRankings();
     int getRank();
     void addRank(int);
     
@@ -58,8 +58,5 @@ private:
     int rank;
     //Function
 };
-
-
-
 
 #endif /* User_hpp */

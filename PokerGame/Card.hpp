@@ -21,7 +21,6 @@ public:
     void getCardInfo();
     Card();
     Card(char,int);
-    Card(char,int,bool); // Debug Purposes
     int getNumber();
     int getValue();
     char getSuit();

@@ -12,10 +12,6 @@
 
 using namespace std;
 
-Round::Round(){
-
-}
-
 void Round::createNewDeck(){
     deck.clear();
     for(char suit: suits){
@@ -26,11 +22,8 @@ void Round::createNewDeck(){
     }
 }
 
-void Round::startRound(Chips &moneyOnTable){
-    
-    moneyOnTable.resetChips();
+void Round::startRound(){
     createNewDeck();
-
 }
 
 

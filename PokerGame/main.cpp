@@ -28,7 +28,7 @@ int main(int argc, const char * argv[]) {
         Table mainTable;
         mainTable.createTable();
     
-        while(true) {
+        while(true) { // TODO Create an End condition to finish the game -> When  the money of all Players but one finishes
         
             mainTable.startRound();
 

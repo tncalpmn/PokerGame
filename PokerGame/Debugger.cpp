@@ -27,17 +27,17 @@ void Debugger::start(){
     
 }
 
-void Debugger::test_Cpp(){
+void Debugger::test_Cpp(){ // testing functionalities of some C++ libraries
 
     
 }
 
-void Debugger::testFunction_payTheWinner(){
+void Debugger::testFunction_payTheWinner(){ // Test Function pay the Winner
     
     // suit s,c,d,h
     // Manuel Fill of Cards on the Table and User Cards
     testTable.cardsOnTheTable.push_back(Card('d',5));
-    testTable.cardsOnTheTable.push_back(Card('h',9));
+    testTable.cardsOnTheTable.push_back(Card('h',1));
     testTable.cardsOnTheTable.push_back(Card('c',9));
     testTable.cardsOnTheTable.push_back(Card('s',7));
     testTable.cardsOnTheTable.push_back(Card('d',13));
@@ -45,18 +45,28 @@ void Debugger::testFunction_payTheWinner(){
     User testUser1;
     testUser1.setId(1);
     testUser1.setName("Test User 1");
-    testUser1.setCards(Card('s',1,true), Card('s',2,true));
+    testUser1.setCards(Card('s',11), Card('s',2));
     
     User testUser2;
     testUser2.setId(2);
     testUser2.setName("Test User 2");
-    testUser2.setCards(Card('c',1,true), Card('h',8,true));
+    testUser2.setCards(Card('s',5), Card('c',9));
+    
+    User testUser3;
+    testUser3.setId(3);
+    testUser3.setName("Test User 3");
+    testUser3.setCards(Card('c',5), Card('h',9));
     
     testTable.allUsers.push_back(testUser1);
     testTable.allUsers.push_back(testUser2);
+    testTable.allUsers.push_back(testUser3);
+    
+    testTable.moneyOnTable.addChips(Chips(int(testTable.allUsers.size() * 13),0,0,0,0,0));
     
     testTable.payTheWinner();
 
+    cout << "Money On the Table: " << endl;
+    testTable.moneyOnTable.getChipInfo();
 }
 
 void Debugger::testFunction_removeAmountAsChips(){
@@ -83,7 +93,7 @@ void Debugger::testClass_Decider(){
     // suit s,c,d,h
     vector<Card> test7Cards;
     
-    // Test_1.1 RoyalFlush Ex: (S_10, S_11, S_12, S_13, S_1, C_1, C_11)                   -> PASSED
+    // Test_1.1 RoyalFlush Ex: (S_10, S_11, S_12, S_13, S_1, C_1, C_11)
     clearAndfillVectorWith7Cards(
                                  test7Cards,
                                  Card('c',12),
@@ -99,7 +109,7 @@ void Debugger::testClass_Decider(){
     cout << "Test_1.1: Is this Combination a Royal Flush: ";
     decider.isRoyalFlush() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;
     
-    // Test_2.1 Straight Flush                                                          -> PROGRESS
+    // Test_2.1 Straight Flush
     clearAndfillVectorWith7Cards(
                                  test7Cards,
                                  Card('c',3),
@@ -219,28 +229,28 @@ void Debugger::testClass_Decider(){
     clearAndfillVectorWith7Cards(
                                  test7Cards,
                                  Card('s',1),
-                                 Card('c',2),
+                                 Card('c',2), // Random
                                  Card('h',1),
-                                 Card('s',2),
-                                 Card('c',3),
-                                 Card('h',2),
+                                 Card('s',2), // Random
+                                 Card('c',3), // Random
+                                 Card('h',2), // Random
                                  Card('c',1)
                                  );
     
     decider = Decider(test7Cards);
     cout << "Test_7.1: Is this Combination a 3 of a Kind: ";
-     decider.is3ofaKind() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;
+    decider.is3ofaKind() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;
     
     // Test_8.1 2 Pair
     clearAndfillVectorWith7Cards(
                                  test7Cards,
                                  Card('s',1),
                                  Card('c',1),
-                                 Card('h',2),
-                                 Card('s',2),
+                                 Card('h',2), // Random
+                                 Card('s',2), // Random
                                  Card('c',3),
                                  Card('h',3),
-                                 Card('s',3)
+                                 Card('s',4)
                                  );
     
     decider = Decider(test7Cards);
@@ -252,11 +262,11 @@ void Debugger::testClass_Decider(){
                                  test7Cards,
                                  Card('s',1),
                                  Card('c',1),
-                                 Card('h',4),
-                                 Card('s',9),
-                                 Card('c',13),
-                                 Card('h',8),
-                                 Card('s',5)
+                                 Card('h',4),  // Random
+                                 Card('s',9),  // Random
+                                 Card('c',13), // Random
+                                 Card('h',8),  // Random
+                                 Card('s',5)   // Random
                                  );
     
     decider = Decider(test7Cards);
@@ -266,7 +276,6 @@ void Debugger::testClass_Decider(){
     cout << "DEBUG_END: testClass_Decider" << endl;
 }
 void Debugger::clearAndfillVectorWith7Cards(vector<Card>& test7Cards, Card card1, Card card2, Card card3, Card card4, Card card5, Card card6, Card card7){
-
     test7Cards.clear();
     test7Cards.push_back(card1);
     test7Cards.push_back(card2);
@@ -275,13 +284,13 @@ void Debugger::clearAndfillVectorWith7Cards(vector<Card>& test7Cards, Card card1
     test7Cards.push_back(card5);
     test7Cards.push_back(card6);
     test7Cards.push_back(card7);
-    
 }
 
 
 bool Debugger::getStatus(){
     return isOn;
 }
+
 void Debugger::setStatus(bool status){
     this->isOn = status;
     isDebuggerOn = status;

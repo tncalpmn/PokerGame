@@ -21,18 +21,7 @@ Card::Card(){
 Card::Card(char suit, int number){
     this->number  = number;
     this->suit = suit;
-    this->value = number == 1 ? 14 : number; // A has actually bigger value than all other cards therefore its value is equaled to maxVal + 1 (13(K) + 1)
-}
-
-Card::Card(char suit, int number, bool isUsersCard){
-    this->number  = number;
-    this->suit = suit;
-    this->value = number == 1 ? 14 : number;
-}
-
-void Card::getCardInfo(){
-    cout << "   - Number: "<< this->number <<endl;
-    cout << "   - Suit: "<< this->suit <<endl;
+    this->value = (number == 1) ? 14 : number; // A has actually bigger value than all other cards therefore its value is equaled to maxVal + 1 (13(K) + 1)
 }
 
 int Card::getNumber(){
@@ -43,15 +32,18 @@ int Card::getValue(){
     return this->value;
 }
 
-bool Card::isEqual(Card crd, bool isSuitRelevant){
-   
+char Card::getSuit(){
+    return this->suit;
+}
+
+void Card::getCardInfo(){
+    cout << "   - Number: "<< this->number <<endl;
+    cout << "   - Suit: "<< this->suit <<endl;
+}
+
+bool Card::isEqual(Card crd, bool isSuitRelevant){ // Compares two cards depending on the switch "isSuitRelevant". If Suit is not relevant only numbers will be compared
     if(isSuitRelevant)
         return this->number == crd.getNumber() && this->suit == crd.getSuit();
     else
         return this->number == crd.getNumber();
-    
-}
-
-char Card::getSuit(){
-    return this->suit;
 }

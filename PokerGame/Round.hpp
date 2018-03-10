@@ -22,8 +22,7 @@ class Round {
  
 public:
     vector<Card> deck;
-    Round();
-    void startRound(Chips&);
+    void startRound();
 private:
     char suits[4] = {'s','h','d','c'};
     int numbersOfEachSuit = 13;
