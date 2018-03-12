@@ -101,11 +101,10 @@ void User::setRandomCards(Round &curRnd){
     srand(seed);
     
     for(int i = 0;i<2;i++){ // TODO This is Wrong currently Array out of boundaries CORRECT!! Check out the other random card setter
-        int randNum = (rand() % curRnd.deck.size()) + 1;
+        int randNum = (rand() % curRnd.deck.size());
         this->cards[i] = curRnd.deck[randNum];
         curRnd.deck.erase(curRnd.deck.begin() + (randNum));
     }
-    cout << (curRnd.deck.size()) << endl;
 }
 
 void User::getPlayerInfo(){

@@ -127,7 +127,7 @@ void Table::startRound(){
                 bigBlindId  = roundTurn(bigBlindId + 1);    // increment BigBlindId prepare for new Round
                 // TODO Decide who won and give money
                 payTheWinner();
-                sleep(2);
+                sleep(SLEEP_TIME);
                 cardsOnTheTable.clear();
                 roundDone = true;
                 // Round Finishes
@@ -307,7 +307,7 @@ void Table::putCardsOnTheTable(){
     srand(seed);
     
     for(int i = 0;i<5;i++){ // TODO Something Wrong
-        int randNum = (rand() % (currentRound.deck.size()));
+        int randNum = (rand() % (currentRound.deck.size())); // 0 - 51, 50, 49, 48, 47
         cardsOnTheTable.push_back(currentRound.deck[randNum]);
         currentRound.deck.erase(currentRound.deck.begin() + randNum);
     }

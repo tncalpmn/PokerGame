@@ -13,5 +13,5 @@ static bool isDebuggerOn = false;           // For testing Functions and Classes
 const int SMALL_BLIND = 5;                  // Small Blind
 const int BIG_BLIND = SMALL_BLIND * 2;      // Big Bling
 const int8_t WEIGHT = 15;                   // Weight should be given to some variations (Ex: Full house, value of three numbers should have more weight then two number
-                                            // 13-13-13-2-2 (197)> 12-12-12-A-A (194)
+const int SLEEP_TIME = 0;                                           // 13-13-13-2-2 (197)> 12-12-12-A-A (194)
 #endif /* Globals_h */

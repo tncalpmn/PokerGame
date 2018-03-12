@@ -9,6 +9,7 @@
 
 #include "Debugger.hpp"
 #include "Globals.hpp"
+#include <stdlib.h>
 
 
 using namespace std;
@@ -23,14 +24,14 @@ void Debugger::start(){
     //testFunction_removeAmountAsChips();     // TEST 1
     //testFunction_amountToChipConverter();   // TEST 2
     //testClass_Decider();                    // TEST 3
-    testFunction_payTheWinner();              // TEST 4
+    //testFunction_payTheWinner();              // TEST 4
     
 }
 
 void Debugger::test_Cpp(){ // testing functionalities of some C++ libraries
 
-    
 }
+
 
 void Debugger::testFunction_payTheWinner(){ // Test Function pay the Winner
     
