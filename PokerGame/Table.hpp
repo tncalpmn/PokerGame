@@ -43,7 +43,10 @@ public:
     bool removeAmountAsChips(int,Chips&,Chips);
     Chips& changeNextAvailableCoinsToOnes(Chips&);
     Chips amountToChipConverter(int, Chips);
-    void payTheWinner();
+    void payTheWinner(int);
+    bool isThereInitDecision();
+    int allFoldedButOne(); // returnsUserID
+    void roundFinishedConditions(bool&, int);
 };
 
 

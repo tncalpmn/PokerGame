@@ -9,6 +9,7 @@
 #ifndef Globals_h
 #define Globals_h
 
+// TODO Macro Maybe?
 static bool isDebuggerOn = false;           // For testing Functions and Classes a backdoor for debugging
 const int SMALL_BLIND = 5;                  // Small Blind
 const int BIG_BLIND = SMALL_BLIND * 2;      // Big Bling

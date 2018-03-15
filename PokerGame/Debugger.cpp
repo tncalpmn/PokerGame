@@ -21,7 +21,7 @@ Debugger::Debugger(){
 void Debugger::start(){
 
     //test_Cpp();
-    //testFunction_removeAmountAsChips();     // TEST 1
+    testFunction_removeAmountAsChips();     // TEST 1
     //testFunction_amountToChipConverter();   // TEST 2
     //testClass_Decider();                    // TEST 3
     //testFunction_payTheWinner();              // TEST 4
@@ -64,7 +64,7 @@ void Debugger::testFunction_payTheWinner(){ // Test Function pay the Winner
     
     testTable.moneyOnTable.addChips(Chips(int(testTable.allUsers.size() * 13),0,0,0,0,0));
     
-    testTable.payTheWinner();
+    testTable.payTheWinner(-1);
 
     cout << "Money On the Table: " << endl;
     testTable.moneyOnTable.getChipInfo();
@@ -76,7 +76,7 @@ void Debugger::testFunction_removeAmountAsChips(){
     cout << "Before Reduction: "<< endl;
     availableAmount.getChipInfo();
 
-    testTable.removeAmountAsChips(367, availableAmount , Chips(0,0,0,0,0,0));
+    testTable.removeAmountAsChips(947,availableAmount,Chips());
     cout <<  "After Reduction: "<< endl;
     availableAmount.getChipInfo();
     cout << "DEBUG_END: testFunction_removeAmountAsChips" << endl;

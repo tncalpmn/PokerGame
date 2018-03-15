@@ -78,9 +78,11 @@ void Table::startRound(){
     setBlinds();
     
     for(User &usr : allUsers){
-        usr.setRandomCards(currentRound);
+        usr.setRandomCards(currentRound); // If not playing anymore, because no money (permanant fold), not include these steps
         usr.initCurrentRoundMoney();
         usr.initRankings();
+        usr.initDecisions();
+        usr.setFold(false);
         usr.getPlayerInfo();
     }
     
@@ -96,22 +98,28 @@ void Table::startRound(){
     while(!roundDone){
         
         for(User usr : allUsers){
-            if(usr.getId() == whoseTurn){
+            if(usr.getId() == whoseTurn && !usr.isFolded()){
                 cout << "- Player " << usr.getName() << "'s turn..." << endl;
+                break;
             }
         }
-        if(whoseTurn == smallBlindId && allUsers[whoseTurn-1].getDecision()=="i"){
+        if(whoseTurn == smallBlindId && allUsers[whoseTurn-1].getDecision()=="i" && !allUsers[whoseTurn-1].isFolded()){
             makeMove(allUsers[whoseTurn-1]); // TODO Is return String necessary?
-        }else if(whoseTurn == bigBlindId && allUsers[whoseTurn-1].getDecision()=="i"){
+        }else if(whoseTurn == bigBlindId && allUsers[whoseTurn-1].getDecision()=="i" && !allUsers[whoseTurn-1].isFolded()){
+            makeMove(allUsers[whoseTurn-1]);
+        }else if(!allUsers[whoseTurn-1].isFolded()){
             makeMove(allUsers[whoseTurn-1]);
         }else{
-            makeMove(allUsers[whoseTurn-1]);
+            whoseTurn = roundTurn(whoseTurn + 1);// FOLDED USER
         }
         
-        if(allUsers[whoseTurn-1].getDecision() != "i"){
+        int idOfremainder = allFoldedButOne(); // if everyone folded but one ? id : -1;
+        
+        
+        if(!isThereInitDecision() && idOfremainder == -1){
             turn++;
             cout << "INFO: A New Turn Starts..." <<endl;
-            initAllUserDecisions();
+            initAllUserDecisions(); // Folded Users decisions are also initializes however they stay as "folded" until next hand
             
             if(turn == 1){
                 for(int i = 0;i<3;i++){
@@ -123,17 +131,53 @@ void Table::startRound(){
                 cardsOnTheTable[4].getCardInfo();
             }
             else{ // Round Finishes Here
-                smallBlindId = roundTurn(smallBlindId + 1); // increment SmallBlindId prepare for new Round
-                bigBlindId  = roundTurn(bigBlindId + 1);    // increment BigBlindId prepare for new Round
-                // TODO Decide who won and give money
-                payTheWinner();
-                sleep(SLEEP_TIME);
-                cardsOnTheTable.clear();
-                roundDone = true;
-                // Round Finishes
+                roundFinishedConditions(roundDone,-1);
             }
+        }else if(idOfremainder != -1){
+            roundFinishedConditions(roundDone, idOfremainder);
         }
     }
+}
+
+void Table::roundFinishedConditions(bool &roundDone, int oneRemainderId){
+    smallBlindId = roundTurn(smallBlindId + 1); // increment SmallBlindId prepare for new Round
+    bigBlindId  = roundTurn(bigBlindId + 1);    // increment BigBlindId prepare for new Round
+    payTheWinner(oneRemainderId); // TODO Exclude Folded Players from payTheWinner
+    sleep(SLEEP_TIME);
+    cardsOnTheTable.clear();
+    roundDone = true;
+}
+
+
+bool Table::isThereInitDecision(){
+    for(User usr : allUsers){
+        if(usr.getDecision() == "i" && !usr.isFolded()){
+            return true;
+            break;
+        }
+    }
+    return false;
+}
+
+int Table::allFoldedButOne(){
+    
+    uint8_t counter = 0;
+    uint8_t numberOfPlayerOnTheTable = allUsers.size();
+    int usedIdOfNonfolder = -1;
+    
+    for(User usr : allUsers){
+        if(usr.isFolded()){
+            counter++;
+        }else{
+            usedIdOfNonfolder = usr.getId();
+        }
+    }
+    
+    if(counter == numberOfPlayerOnTheTable-1){
+        return usedIdOfNonfolder;
+    }
+    
+    return -1;
 }
 
 void Table::setBlinds(){
@@ -247,7 +291,7 @@ bool Table::removeAmountAsChips(int amount, Chips &availableAmount, Chips init){
     return wasRemoveSuccesful;
 }
 
-Chips& Table::changeNextAvailableCoinsToOnes(Chips &availableAmount){
+Chips& Table::changeNextAvailableCoinsToOnes(Chips &availableAmount){ // TODO Converter Class
     if(availableAmount.getFives() > 0){
         availableAmount.addChips(Chips(availableAmount.getFives()*5,0,0,0,0,0));
         availableAmount.removeChips(Chips(0,availableAmount.getFives(),0,0,0,0));
@@ -271,7 +315,7 @@ Chips& Table::changeNextAvailableCoinsToOnes(Chips &availableAmount){
     }
 }
 
-Chips Table::amountToChipConverter(int amount, Chips init){
+Chips Table::amountToChipConverter(int amount, Chips init){ // TODO Converter Class
     
     if(amount >= 100){
         init.addChips(Chips(0,0,0,0,0, amount / 100));
@@ -329,8 +373,8 @@ string Table::makeMove(User &userToMakeMove){
     while(flag){
         
         cout << "Do you want to even/check(e) raise(r<ChipCode><Amount>), or fold(f)? " << endl;
-        //cin >> decision;
-        decision = "e";
+        cin >> decision;
+        //decision = "e";
         
         if(decision == "e"){
             cout << "Selection Even/Check" << endl;
@@ -346,6 +390,9 @@ string Table::makeMove(User &userToMakeMove){
         }
         else if(decision == "f"){
             cout << "Selection Fold" << endl;
+            userToMakeMove.setDecision(decision);
+            userToMakeMove.setFold(true);
+            whoseTurn = roundTurn(userToMakeMove.getId() + 1);
             flag = false;
         }else if(decision == "r"){ // TODO Regex & getLine func
             // TODO all but this user decision should go to init -> i
@@ -364,122 +411,132 @@ void Table::initAllUserDecisions(){
     }
 }
 
-void Table::payTheWinner(){ // TODO Pay the money who is on the Game on the Current Round
+void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on the Game on the Current Round
     
     map<int,vector<Card>> combined7Cards;
-    
-    for(User usr : allUsers){
-        vector<Card> cardArray;
-        for(int i = 0; i< 2;i++){
-            cardArray.push_back(usr.getCards()[i]);
-        }
-        for(Card card : cardsOnTheTable){
-            cardArray.push_back(card);
-        }
-        combined7Cards.insert(pair<int,vector<Card>>(usr.getId(),cardArray)); // map = (UserID & Users_Combined_7_Card)
-    }
-    
-    map<int,vector<Card>>::iterator it;
     int highestRank = 0;
     int8_t numberOfWinners = 0;
-    for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){ // iterate through all users
+    map<int,vector<Card>>::iterator it;
     
-        Decider decisionMaker(it->second);
-        
-        if(decisionMaker.isRoyalFlush()){            // Royal Flush
-            cout << "ROYAL FLUSH" << endl;
-            allUsers[(it->first)-1].addRank(9000);
-        }else if(decisionMaker.isStraightFlush()){   // Straight Flush
-            cout << "STRAIGHT FLUSH" << endl;
-            allUsers[(it->first)-1].addRank(8000);
-            allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
-                                                                   decisionMaker.highestCombination.back()));
-        }else if(decisionMaker.is4ofaKind()){        // 4 of a Kind
-            cout << "4 OF A KIND" << endl;
-            allUsers[(it->first)-1].addRank(7000);
-            map<Card, int> fourAndOne = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-            for(pair<Card,int> each : fourAndOne){
-                allUsers[(it->first)-1].addRank(each.second == 4 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-            }
-        }else if(decisionMaker.isFullHouse()){       // Full House
-            cout << "FULL HOUSE" << endl;
-            allUsers[(it->first)-1].addRank(6000);
-            map<Card, int> twosAndThrees = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-            for(pair<Card,int> each : twosAndThrees){
-                allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-            }
-        }else if(decisionMaker.isFlush()){           // Flush
-            cout << "FLUSH" << endl;
-            allUsers[(it->first)-1].addRank(5000);
-            allUsers[(it->first)-1].addRank(decisionMaker.highestCombination.front().getValue());
-        }else if(decisionMaker.isStraight()){        // Straight
-            cout << "STRAIGHT" << endl;
-            allUsers[(it->first)-1].addRank(4000);
-            allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
-                                                                   decisionMaker.highestCombination.back()));
-        }else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind
-            cout << "3 OF A KIND" << endl;
-            allUsers[(it->first)-1].addRank(3000);
-            map<Card, int> threesAnd2Highs = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-            for(pair<Card,int> each : threesAnd2Highs){
-                allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-            }
-        }else if(decisionMaker.is2Pair()){           // Two Pair
-            cout << "TWO PAIR" << endl;
-            allUsers[(it->first)-1].addRank(2000);
-            map<Card, int> two2And1High = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-            for(pair<Card,int> each : two2And1High){
-                allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-            }
-        }else if(decisionMaker.is1Pair()){           // One Pair
-            cout << "ONE PAIR" << endl;
-            allUsers[(it->first)-1].addRank(1000);
-            map<Card, int> onePairAndRest = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-            for(pair<Card,int> each : onePairAndRest){
-                allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-            }
-        }else{                                       // High Card
-            decisionMaker.setHighestFive();
-            cout << "HIGH CARD" << endl;
-            allUsers[(it->first)-1].addRank(decisionMaker.getAll7Cards().front().getValue()); // SORTED LIST
-        }
+    if(oneRemainderId == -1){
     
-        cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << endl;
-        for(Card crd : decisionMaker.highestCombination){
-            crd.getCardInfo();
+        for(User usr : allUsers){
+            vector<Card> cardArray;
+            for(int i = 0; i< 2;i++){
+                cardArray.push_back(usr.getCards()[i]);
+            }
+            for(Card card : cardsOnTheTable){
+                cardArray.push_back(card);
+            }
+            combined7Cards.insert(pair<int,vector<Card>>(usr.getId(),cardArray)); // map = (UserID & Users_Combined_7_Card)
         }
         
-        if(allUsers[(it->first)-1].getRank() > highestRank){
-            highestRank = allUsers[(it->first)-1].getRank();
+        for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){ // iterate through all users
+        
+            Decider decisionMaker(it->second); // Refactoring TODO
+            
+            if(decisionMaker.isRoyalFlush()){            // Royal Flush
+                cout << "ROYAL FLUSH" << endl;
+                allUsers[(it->first)-1].addRank(9000);
+            }else if(decisionMaker.isStraightFlush()){   // Straight Flush
+                cout << "STRAIGHT FLUSH" << endl;
+                allUsers[(it->first)-1].addRank(8000);
+                allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
+                                                                       decisionMaker.highestCombination.back()));
+            }else if(decisionMaker.is4ofaKind()){        // 4 of a Kind
+                cout << "4 OF A KIND" << endl;
+                allUsers[(it->first)-1].addRank(7000);
+                map<Card, int> fourAndOne = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+                for(pair<Card,int> each : fourAndOne){
+                    allUsers[(it->first)-1].addRank(each.second == 4 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+                }
+            }else if(decisionMaker.isFullHouse()){       // Full House
+                cout << "FULL HOUSE" << endl;
+                allUsers[(it->first)-1].addRank(6000);
+                map<Card, int> twosAndThrees = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+                for(pair<Card,int> each : twosAndThrees){
+                    allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+                }
+            }else if(decisionMaker.isFlush()){           // Flush
+                cout << "FLUSH" << endl;
+                allUsers[(it->first)-1].addRank(5000);
+                allUsers[(it->first)-1].addRank(decisionMaker.highestCombination.front().getValue());
+            }else if(decisionMaker.isStraight()){        // Straight
+                cout << "STRAIGHT" << endl;
+                allUsers[(it->first)-1].addRank(4000);
+                allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
+                                                                       decisionMaker.highestCombination.back()));
+            }else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind
+                cout << "3 OF A KIND" << endl;
+                allUsers[(it->first)-1].addRank(3000);
+                map<Card, int> threesAnd2Highs = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+                for(pair<Card,int> each : threesAnd2Highs){
+                    allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+                }
+            }else if(decisionMaker.is2Pair()){           // Two Pair
+                cout << "TWO PAIR" << endl;
+                allUsers[(it->first)-1].addRank(2000);
+                map<Card, int> two2And1High = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+                for(pair<Card,int> each : two2And1High){
+                    allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+                }
+            }else if(decisionMaker.is1Pair()){           // One Pair
+                cout << "ONE PAIR" << endl;
+                allUsers[(it->first)-1].addRank(1000);
+                map<Card, int> onePairAndRest = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
+                for(pair<Card,int> each : onePairAndRest){
+                    allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+                }
+            }else{                                       // High Card
+                decisionMaker.setHighestFive();
+                cout << "HIGH CARD" << endl;
+                allUsers[(it->first)-1].addRank(decisionMaker.getAll7Cards().front().getValue()); // SORTED LIST
+            }
+        
+            cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << endl;
+            for(Card crd : decisionMaker.highestCombination){
+                crd.getCardInfo();
+            }
+            
+            if(allUsers[(it->first)-1].getRank() > highestRank){
+                highestRank = allUsers[(it->first)-1].getRank();
+            }
         }
-    }
-    for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){
-        if(allUsers[(it->first)-1].getRank() == highestRank){
-            numberOfWinners++;
+        for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){
+            if(allUsers[(it->first)-1].getRank() == highestRank){
+                numberOfWinners++;
+            }
         }
-    }
     
-    // TODO Turn into Function
-    int totalAmount = moneyOnTable.sumOfChips();
-    int toShare = 0;
-    if(totalAmount % numberOfWinners != 0){
-        toShare = (int) (totalAmount / numberOfWinners);
-        moneyOnTable.resetChips();
-        moneyOnTable.addChips(amountToChipConverter(totalAmount % numberOfWinners, Chips())); // Remainders leave it on the Table for next Round
-    }else{
-        toShare = totalAmount / numberOfWinners;
-        moneyOnTable.resetChips();
-    }
-    
-    for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){
-        if(allUsers[(it->first)-1].getRank() == highestRank){
-            User *winner = &allUsers[(it->first)-1];
-            winner->getChips().addChips(amountToChipConverter(toShare,Chips()));
-            cout << "Winner(s): " << winner->getName() << " with Rank: " << winner->getRank() << endl;
-        }
-        if(isDebuggerOn) allUsers[(it->first)-1].getChips().getChipInfo();
-    }
 
+        // TODO Turn into Function
+        int totalAmount = moneyOnTable.sumOfChips();
+        int toShare = 0;
+        if(totalAmount % numberOfWinners != 0){
+            toShare = (int) (totalAmount / numberOfWinners);
+            moneyOnTable.resetChips();
+            moneyOnTable.addChips(amountToChipConverter(totalAmount % numberOfWinners, Chips())); // Remainders leave it on the Table for next Round
+        }else{
+            toShare = totalAmount / numberOfWinners;
+            moneyOnTable.resetChips();
+        }
+        
+        for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){
+            if(allUsers[(it->first)-1].getRank() == highestRank){
+                User *winner = &allUsers[(it->first)-1];
+                winner->getChips().addChips(amountToChipConverter(toShare,Chips()));
+                cout << "Winner(s): " << winner->getName() << " with Rank: " << winner->getRank() << endl;
+            }
+            if(isDebuggerOn) allUsers[(it->first)-1].getChips().getChipInfo();
+        }
+    
+    }else{
+        User *winner = &allUsers[oneRemainderId-1];
+
+        winner->getChips().addChips(moneyOnTable);
+        cout << "Everyone folded but " << winner->getName() << ". Therefore is the only Winner!" << endl;;
+        moneyOnTable.resetChips();
+    }
 }
 
 int getConsecutiveHighCard(Card front, Card back){

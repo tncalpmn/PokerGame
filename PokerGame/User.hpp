@@ -42,6 +42,7 @@ public:
     string getDecision();
     void initDecisions();
     void initCurrentRoundMoney();
+    int getCurrentRoundMoney();
     void initRankings();
     int getRank();
     void addRank(int);

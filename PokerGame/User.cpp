@@ -30,6 +30,10 @@ void User::initCurrentRoundMoney(){
     this->amoundPutOnCurrentRound = 0;
 }
 
+int User::getCurrentRoundMoney(){
+    return amoundPutOnCurrentRound;
+}
+
 void User::initRankings(){
     this->rank = 0;
 }
@@ -63,7 +67,7 @@ bool User::isFolded(){
 }
 
 void User::setFold(bool fld){
-    this->name = fld;
+    this->folded = fld;
 }
 
 string User::getName(){
