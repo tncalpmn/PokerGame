@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "Card.hpp"
+#include "User.hpp"
 #include <vector>
 #include <map>
 
@@ -21,14 +22,22 @@ class Decider {
     
 private:
     vector<Card> all7Cards;
-    map<char, int> countSuits();
+    vector<Card> highestCombination;
     map<char, int> numbOfSuits;
     map<int, int> numbOfNumbers;
+
+    void setHighestFive();
+    int getConsecutiveHighCard(Card, Card);
+    map<char, int> countSuits();
+    map<Card,int> groupCardsWithNums(vector<Card>);
     char atLeastFiveSuit();
     char atLeastFiveSuits = 'n';
     bool isConsecutive(vector<Card>);
-
+    map<int, int>  countNumbers(vector<Card>);
+    
 public:
+
+    Decider(vector<Card>);
     bool isRoyalFlush();
     bool isStraightFlush();
     bool is4ofaKind();
@@ -38,17 +47,8 @@ public:
     bool is3ofaKind();
     bool is2Pair();
     bool is1Pair();
-    vector<Card> highestCombination;
-    map<int, int>  countNumbers(vector<Card>);
-    map<Card,int> groupCardsWithNums(vector<Card>);
-    vector<Card> getAll7Cards();
-    void setHighestFive();
-    
-    static bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
-    static bool sortByValue (Card first,Card second) { return (first.getValue() > second.getValue());} // bigger to smaller
-    static bool containsCard(vector<Card> vec, Card crd, bool isSuitRelevant){ for(Card v : vec){ if(v.isEqual(crd,isSuitRelevant)){return true;}}return false;}
+    void setRankFor(User &usr);
 
-    Decider(vector<Card>);
 };
 
 #endif /* Decider_hpp */

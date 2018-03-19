@@ -21,10 +21,10 @@ Debugger::Debugger(){
 void Debugger::start(){
 
     //test_Cpp();
-    testFunction_removeAmountAsChips();     // TEST 1
+    //testFunction_removeAmountAsChips();     // TEST 1
     //testFunction_amountToChipConverter();   // TEST 2
-    //testClass_Decider();                    // TEST 3
-    //testFunction_payTheWinner();              // TEST 4
+    testClass_Decider();                    // TEST 3
+    //testFunction_payTheWinner();            // TEST 4
     
 }
 
@@ -76,7 +76,7 @@ void Debugger::testFunction_removeAmountAsChips(){
     cout << "Before Reduction: "<< endl;
     availableAmount.getChipInfo();
 
-    testTable.removeAmountAsChips(947,availableAmount,Chips());
+    Converter::removeAmountAsChips(947,availableAmount,Chips());
     cout <<  "After Reduction: "<< endl;
     availableAmount.getChipInfo();
     cout << "DEBUG_END: testFunction_removeAmountAsChips" << endl;
@@ -270,6 +270,7 @@ void Debugger::testClass_Decider(){
                                  Card('s',5)   // Random
                                  );
     
+ 
     decider = Decider(test7Cards);
     cout << "Test_9.1: Is this Combination a 1 Pair ";
     decider.is1Pair() ? cout << "TRUE" << endl: cout << "FALSE" <<endl;

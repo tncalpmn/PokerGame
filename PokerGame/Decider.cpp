@@ -7,16 +7,86 @@
 //
 
 #include "Decider.hpp"
+#include "Globals.hpp"
 #include <algorithm>
 
 using namespace std;
 
-Decider::Decider(vector<Card> all7Cards){
+static bool sortNumbers (Card first,Card second) { return (first.getNumber() < second.getNumber());}
+static bool sortByValue (Card first,Card second) { return (first.getValue() > second.getValue());} // bigger to smaller
+static bool containsCard(vector<Card> vec, Card crd, bool isSuitRelevant){ for(Card v : vec){ if(v.isEqual(crd,isSuitRelevant)){return true;}}return false;}
+
+Decider::Decider(vector<Card> all7CardsFunc){
+    all7Cards = all7CardsFunc;
     sort(all7Cards.begin(), all7Cards.end(), sortByValue);
-    this->all7Cards = all7Cards;
     numbOfSuits = countSuits();
     numbOfNumbers = countNumbers(all7Cards);
     atLeastFiveSuits = atLeastFiveSuit();
+}
+
+void Decider::setRankFor(User &usr){
+
+    if(isRoyalFlush()){            // Royal Flush
+        cout << "ROYAL FLUSH" << endl;
+        usr.addRank(9000);
+    }else if(isStraightFlush()){   // Straight Flush
+        cout << "STRAIGHT FLUSH" << endl;
+        usr.addRank(8000);
+        usr.addRank(getConsecutiveHighCard(highestCombination.front(), highestCombination.back()));
+    }else if(is4ofaKind()){        // 4 of a Kind
+        cout << "4 OF A KIND" << endl;
+        usr.addRank(7000);
+        map<Card, int> fourAndOne = groupCardsWithNums(highestCombination);
+        for(pair<Card,int> each : fourAndOne){
+            usr.addRank(each.second == 4 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+        }
+    }else if(isFullHouse()){       // Full House
+        cout << "FULL HOUSE" << endl;
+        usr.addRank(6000);
+        map<Card, int> twosAndThrees = groupCardsWithNums(highestCombination);
+        for(pair<Card,int> each : twosAndThrees){
+            usr.addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+        }
+    }else if(isFlush()){           // Flush
+        cout << "FLUSH" << endl;
+        usr.addRank(5000);
+        usr.addRank(highestCombination.front().getValue());
+    }else if(isStraight()){        // Straight
+        cout << "STRAIGHT" << endl;
+        usr.addRank(4000);
+        usr.addRank(getConsecutiveHighCard(highestCombination.front(), highestCombination.back()));
+    }else if(is3ofaKind()){        // 3 Of a Kind
+        cout << "3 OF A KIND" << endl;
+        usr.addRank(3000);
+        map<Card, int> threesAnd2Highs = groupCardsWithNums(highestCombination);
+        for(pair<Card,int> each : threesAnd2Highs){
+            usr.addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+        }
+    }else if(is2Pair()){           // Two Pair
+        cout << "TWO PAIR" << endl;
+        usr.addRank(2000);
+        map<Card, int> two2And1High = groupCardsWithNums(highestCombination);
+        for(pair<Card,int> each : two2And1High){
+            usr.addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+        }
+    }else if(is1Pair()){           // One Pair
+        cout << "ONE PAIR" << endl;
+        usr.addRank(1000);
+        map<Card, int> onePairAndRest = groupCardsWithNums(highestCombination);
+        for(pair<Card,int> each : onePairAndRest){
+            usr.addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
+        }
+    }else{                                       // High Card
+        setHighestFive();
+        cout << "HIGH CARD" << endl;
+        usr.addRank(all7Cards.front().getValue()); // SORTED LIST
+    }
+    
+    cout << "User ID: "<< usr.getId() << " User Rank: "<<usr.getRank() << endl;
+    for(Card crd : highestCombination){
+        crd.getCardInfo();
+    }
+
 }
 
 map<char, int>  Decider::countSuits(){ // Helper Function: Count Suits in all 7 Cards
@@ -121,10 +191,6 @@ map<Card,int> Decider::groupCardsWithNums(vector<Card> cards){ // Helper Functio
         }
     }
     return group;
-}
-
-vector<Card> Decider::getAll7Cards(){
-    return all7Cards;
 }
 
 bool Decider::isRoyalFlush(){
@@ -403,5 +469,13 @@ void Decider::setHighestFive(){
         }else{
             break;
         }
+    }
+}
+
+int Decider::getConsecutiveHighCard(Card front, Card back){
+    if(front.getNumber() == 1 && back.getNumber() == 13){
+        return front.getValue();
+    }else{
+        return back.getValue();
     }
 }

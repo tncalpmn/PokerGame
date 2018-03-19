@@ -192,157 +192,20 @@ void Table::setBlinds(){
     }
 }
 
+
 void Table::putBlindsMoney(){
-    moneyOnTable.addChips(amountToChipConverter(SMALL_BLIND + BIG_BLIND, Chips(0,0,0,0,0,0))); // TODO If remove from user is Successfull then add chips otherwise infinite Money
+    
+    moneyOnTable.addChips(Converter::amountToChipConverter(SMALL_BLIND + BIG_BLIND, Chips(0,0,0,0,0,0))); // TODO If remove from user is Successfull then add chips otherwise infinite Money
     for(User usr : allUsers){
         if(usr.getId()==smallBlindId){
-            removeAmountAsChips(SMALL_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
+            Converter::removeAmountAsChips(SMALL_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
             usr.addCurrentRoundMoney(SMALL_BLIND);
             allUsers[smallBlindId-1] = usr;
         }else if(usr.getId()== bigBlindId){
-            removeAmountAsChips(BIG_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
+            Converter::removeAmountAsChips(BIG_BLIND, usr.getChips(), Chips(0,0,0,0,0,0)); // TODO Check if Remove Succesfull
             usr.addCurrentRoundMoney(BIG_BLIND);
             allUsers[bigBlindId-1] = usr;
         }
-    }
-}
-
-bool Table::removeAmountAsChips(int amount, Chips &availableAmount, Chips init){ // TODO Converter Class
-    
-    bool wasRemoveSuccesful = true;
-    
-    if(amount == 0){
-        isDebuggerOn ? cout << "Reduction Successful!" << endl: cout << "";
-    }else if(1 <= amount && amount <= availableAmount.getOnes() * 1){
-        init.addChips(Chips(amount / 1,0,0,0,0,0));
-        availableAmount.removeChips(Chips(amount / 1,0,0,0,0,0));
-        amount = amount % 1;
-        removeAmountAsChips(amount, availableAmount, init);
-    }else if(5 <= amount && amount <= availableAmount.getFives() * 5){
-        init.addChips(Chips(0,amount / 5,0,0,0,0));
-        availableAmount.removeChips(Chips(0,amount / 5,0,0,0,0));
-        amount = amount % 5;
-        removeAmountAsChips(amount, availableAmount, init);
-    }else if(10 <= amount && amount <= availableAmount.getTens() * 10){
-        init.addChips(Chips(0,0,amount / 10,0,0,0));
-        availableAmount.removeChips(Chips(0,0,amount / 10,0,0,0));
-        amount = amount % 10;
-        removeAmountAsChips(amount, availableAmount, init);
-    }else if(20 <= amount && amount <= availableAmount.getTwentys() * 20){
-        init.addChips(Chips(0,0,0,amount / 20,0,0));
-        availableAmount.removeChips(Chips(0,0,0,amount / 20,0,0));
-        amount = amount % 20;
-        removeAmountAsChips(amount, availableAmount, init);
-    }else if(50 <= amount && amount <= availableAmount.getFiftys() * 50){
-        init.addChips(Chips(0,0,0,0,amount / 50,0));
-        availableAmount.removeChips(Chips(0,0,0,0,amount / 50,0));
-        amount = amount % 50;
-        removeAmountAsChips(amount, availableAmount, init);
-    }else if(100 <= amount && amount <= availableAmount.getHunderts() * 100) {
-        init.addChips(Chips(0,0,0,0,0,amount / 100));
-        availableAmount.removeChips(Chips(0,0,0,0,0,amount / 100));
-        amount = amount % 100;
-        removeAmountAsChips(amount, availableAmount, init);
-    }else if(amount <= availableAmount.sumOfChips()){
-        int div = 0;
-        if(amount % 100 == 0 && availableAmount.getHunderts() != 0){
-            div = amount / 100;
-            init.addChips(Chips(0,0,0,0,0,1));
-            amount = (div - 1) * 100;
-            availableAmount.removeChips(Chips(0,0,0,0,0,1));
-            removeAmountAsChips(amount, availableAmount, init);
-        }else if(amount % 50 == 0 && availableAmount.getFiftys() != 0){
-            div = amount / 50;
-            init.addChips(Chips(0,0,0,0,1,0));
-            amount = (div - 1) * 50;
-            availableAmount.removeChips(Chips(0,0,0,0,1,0));
-            removeAmountAsChips(amount, availableAmount, init);
-        }else if(amount % 20 == 0 && availableAmount.getTwentys() != 0){
-            div = amount / 20;
-            init.addChips(Chips(0,0,0,1,0,0));
-            amount = (div - 1) * 20;
-            availableAmount.removeChips(Chips(0,0,0,1,0,0));
-            removeAmountAsChips(amount, availableAmount, init);
-        }else if(amount % 10 == 0 && availableAmount.getTens() != 0){
-            div = amount / 10;
-            init.addChips(Chips(0,0,1,0,0,0));
-            amount = (div - 1) * 10;
-            availableAmount.removeChips(Chips(0,0,1,0,0,0));
-            removeAmountAsChips(amount, availableAmount, init);
-        }else if(amount % 5 == 0 && availableAmount.getFives() != 0){
-            div = amount / 5;
-            init.addChips(Chips(0,1,0,0,0,0));
-            amount = (div - 1) * 5;
-            availableAmount.removeChips(Chips(0,1,0,0,0,0));
-            removeAmountAsChips(amount, availableAmount, init);
-        }else if(amount % 1 == 0 && availableAmount.getOnes() != 0){
-            div = amount / 1;
-            init.addChips(Chips(1,0,0,0,0,0));
-            amount = (div - 1) * 1;
-            availableAmount.removeChips(Chips(1,0,0,0,0,0));
-            removeAmountAsChips(amount, availableAmount, init);
-        }else{
-            removeAmountAsChips(amount, changeNextAvailableCoinsToOnes(availableAmount), init);
-        }
-    }else{
-        cout << "ERROR User Has Not enought money - TODO" << endl; // TODO
-        wasRemoveSuccesful = false;
-    }
-    return wasRemoveSuccesful;
-}
-
-Chips& Table::changeNextAvailableCoinsToOnes(Chips &availableAmount){ // TODO Converter Class
-    if(availableAmount.getFives() > 0){
-        availableAmount.addChips(Chips(availableAmount.getFives()*5,0,0,0,0,0));
-        availableAmount.removeChips(Chips(0,availableAmount.getFives(),0,0,0,0));
-        return availableAmount;
-    }else if(availableAmount.getTens() > 0){
-        availableAmount.addChips(Chips(availableAmount.getTens()*10,0,0,0,0,0));
-        availableAmount.removeChips(Chips(0,0,availableAmount.getTens(),0,0,0));
-        return availableAmount;
-    }else if(availableAmount.getTwentys() > 0){
-        availableAmount.addChips(Chips(availableAmount.getTwentys()*20,0,0,0,0,0));
-        availableAmount.removeChips(Chips(0,0,0,availableAmount.getTwentys(),0,0));
-        return availableAmount;
-    }else if(availableAmount.getFiftys() > 0){
-        availableAmount.addChips(Chips(availableAmount.getFiftys()*50,0,0,0,0,0));
-        availableAmount.removeChips(Chips(0,0,0,0,availableAmount.getFiftys(),0));
-        return availableAmount;
-    }else{
-        availableAmount.addChips(Chips(availableAmount.getHunderts()*100,0,0,0,0,0));
-        availableAmount.removeChips(Chips(0,0,0,0,0,availableAmount.getHunderts()));
-        return availableAmount;
-    }
-}
-
-Chips Table::amountToChipConverter(int amount, Chips init){ // TODO Converter Class
-    
-    if(amount >= 100){
-        init.addChips(Chips(0,0,0,0,0, amount / 100));
-        amount = amount % 100;
-        return amountToChipConverter(amount, init);
-    }else if(amount >= 50){
-        init.addChips(Chips(0,0,0,0,amount / 50,0));
-        amount = amount % 50;
-        return amountToChipConverter(amount, init);
-    }else if(amount >= 20){
-        init.addChips(Chips(0,0,0,amount / 20,0,0));
-        amount = amount % 20;
-        return amountToChipConverter(amount, init);
-    }else if(amount >= 10){
-        init.addChips(Chips(0,0,amount / 10,0,0,0));
-        amount = amount % 10;
-        return amountToChipConverter(amount, init);
-    }else if(amount >= 5){
-        init.addChips(Chips(0,amount/5,0,0,0,0));
-        amount = amount % 5;
-        return amountToChipConverter(amount, init);
-    }else if(amount >= 1){
-        init.addChips(Chips(amount/1,0,0,0,0,0));
-        amount = amount % 1;
-        return amountToChipConverter(amount, init);
-    }else{
-        return init;
     }
 }
 
@@ -381,8 +244,8 @@ string Table::makeMove(User &userToMakeMove){
             userToMakeMove.setDecision(decision);
             if(toEven > userToMakeMove.amoundPutOnCurrentRound){
                 int rest = toEven - userToMakeMove.amoundPutOnCurrentRound;
-                moneyOnTable.addChips(amountToChipConverter(rest, Chips(0,0,0,0,0,0)));      // 1
-                removeAmountAsChips(rest, userToMakeMove.getChips(), Chips(0,0,0,0,0,0));    // 2
+                moneyOnTable.addChips(Converter::amountToChipConverter(rest, Chips(0,0,0,0,0,0)));      // 1
+                Converter::removeAmountAsChips(rest, userToMakeMove.getChips(), Chips(0,0,0,0,0,0));    // 2
                 userToMakeMove.addCurrentRoundMoney(rest);                                   // 3 TODO All in One
             }
             whoseTurn = roundTurn(userToMakeMove.getId() + 1);
@@ -432,90 +295,28 @@ void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on th
         }
         
         for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){ // iterate through all users
-        
-            Decider decisionMaker(it->second); // Refactoring TODO
             
-            if(decisionMaker.isRoyalFlush()){            // Royal Flush
-                cout << "ROYAL FLUSH" << endl;
-                allUsers[(it->first)-1].addRank(9000);
-            }else if(decisionMaker.isStraightFlush()){   // Straight Flush
-                cout << "STRAIGHT FLUSH" << endl;
-                allUsers[(it->first)-1].addRank(8000);
-                allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
-                                                                       decisionMaker.highestCombination.back()));
-            }else if(decisionMaker.is4ofaKind()){        // 4 of a Kind
-                cout << "4 OF A KIND" << endl;
-                allUsers[(it->first)-1].addRank(7000);
-                map<Card, int> fourAndOne = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-                for(pair<Card,int> each : fourAndOne){
-                    allUsers[(it->first)-1].addRank(each.second == 4 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-                }
-            }else if(decisionMaker.isFullHouse()){       // Full House
-                cout << "FULL HOUSE" << endl;
-                allUsers[(it->first)-1].addRank(6000);
-                map<Card, int> twosAndThrees = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-                for(pair<Card,int> each : twosAndThrees){
-                    allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-                }
-            }else if(decisionMaker.isFlush()){           // Flush
-                cout << "FLUSH" << endl;
-                allUsers[(it->first)-1].addRank(5000);
-                allUsers[(it->first)-1].addRank(decisionMaker.highestCombination.front().getValue());
-            }else if(decisionMaker.isStraight()){        // Straight
-                cout << "STRAIGHT" << endl;
-                allUsers[(it->first)-1].addRank(4000);
-                allUsers[(it->first)-1].addRank(getConsecutiveHighCard(decisionMaker.highestCombination.front(),
-                                                                       decisionMaker.highestCombination.back()));
-            }else if(decisionMaker.is3ofaKind()){        // 3 Of a Kind
-                cout << "3 OF A KIND" << endl;
-                allUsers[(it->first)-1].addRank(3000);
-                map<Card, int> threesAnd2Highs = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-                for(pair<Card,int> each : threesAnd2Highs){
-                    allUsers[(it->first)-1].addRank(each.second == 3 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-                }
-            }else if(decisionMaker.is2Pair()){           // Two Pair
-                cout << "TWO PAIR" << endl;
-                allUsers[(it->first)-1].addRank(2000);
-                map<Card, int> two2And1High = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-                for(pair<Card,int> each : two2And1High){
-                    allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-                }
-            }else if(decisionMaker.is1Pair()){           // One Pair
-                cout << "ONE PAIR" << endl;
-                allUsers[(it->first)-1].addRank(1000);
-                map<Card, int> onePairAndRest = decisionMaker.groupCardsWithNums(decisionMaker.highestCombination);
-                for(pair<Card,int> each : onePairAndRest){
-                    allUsers[(it->first)-1].addRank(each.second == 2 ? WEIGHT * each.first.getValue() : each.first.getValue() );
-                }
-            }else{                                       // High Card
-                decisionMaker.setHighestFive();
-                cout << "HIGH CARD" << endl;
-                allUsers[(it->first)-1].addRank(decisionMaker.getAll7Cards().front().getValue()); // SORTED LIST
-            }
-        
-            cout << "User ID: "<< allUsers[(it->first)-1].getId() << " User Rank: "<<allUsers[(it->first)-1].getRank() << endl;
-            for(Card crd : decisionMaker.highestCombination){
-                crd.getCardInfo();
-            }
+            Decider decider = Decider(it->second); // Sets the ranks of the user from Current Round
+            decider.setRankFor(allUsers[it->first-1]);
             
             if(allUsers[(it->first)-1].getRank() > highestRank){
                 highestRank = allUsers[(it->first)-1].getRank();
             }
         }
+        
         for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){
             if(allUsers[(it->first)-1].getRank() == highestRank){
                 numberOfWinners++;
             }
         }
     
-
         // TODO Turn into Function
         int totalAmount = moneyOnTable.sumOfChips();
         int toShare = 0;
         if(totalAmount % numberOfWinners != 0){
             toShare = (int) (totalAmount / numberOfWinners);
             moneyOnTable.resetChips();
-            moneyOnTable.addChips(amountToChipConverter(totalAmount % numberOfWinners, Chips())); // Remainders leave it on the Table for next Round
+            moneyOnTable.addChips(Converter::amountToChipConverter(totalAmount % numberOfWinners, Chips())); // Remainders leave it on the Table for next Round
         }else{
             toShare = totalAmount / numberOfWinners;
             moneyOnTable.resetChips();
@@ -524,7 +325,7 @@ void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on th
         for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){
             if(allUsers[(it->first)-1].getRank() == highestRank){
                 User *winner = &allUsers[(it->first)-1];
-                winner->getChips().addChips(amountToChipConverter(toShare,Chips()));
+                winner->getChips().addChips(Converter::amountToChipConverter(toShare,Chips()));
                 cout << "Winner(s): " << winner->getName() << " with Rank: " << winner->getRank() << endl;
             }
             if(isDebuggerOn) allUsers[(it->first)-1].getChips().getChipInfo();
@@ -539,10 +340,3 @@ void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on th
     }
 }
 
-int getConsecutiveHighCard(Card front, Card back){
-    if(front.getNumber() == 1 && back.getNumber() == 13){
-        return front.getValue();
-    }else{
-        return back.getValue();
-    }
-}

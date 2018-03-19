@@ -13,6 +13,7 @@
 #include "User.hpp"
 #include "Round.hpp"
 #include <vector>
+#include "Converter.hpp"
 
 
 class Table {
@@ -40,9 +41,6 @@ public:
     //Functions
     void createTable();
     void createRound();
-    bool removeAmountAsChips(int,Chips&,Chips);
-    Chips& changeNextAvailableCoinsToOnes(Chips&);
-    Chips amountToChipConverter(int, Chips);
     void payTheWinner(int);
     bool isThereInitDecision();
     int allFoldedButOne(); // returnsUserID
