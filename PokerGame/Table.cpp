@@ -274,7 +274,7 @@ void Table::initAllUserDecisions(){
     }
 }
 
-void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on the Game on the Current Round
+void Table::payTheWinner(int oneRemainderId){
     
     map<int,vector<Card>> combined7Cards;
     int highestRank = 0;
@@ -283,7 +283,7 @@ void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on th
     
     if(oneRemainderId == -1){
     
-        for(User usr : allUsers){
+        for(User usr : allUsers){ // TODO More Efficient maybe?
             vector<Card> cardArray;
             for(int i = 0; i< 2;i++){
                 cardArray.push_back(usr.getCards()[i]);
@@ -296,7 +296,7 @@ void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on th
         
         for(it = combined7Cards.begin(); it != combined7Cards.end(); it++){ // iterate through all users
             
-            Decider decider = Decider(it->second); // Sets the ranks of the user from Current Round
+            Decider decider(it->second); // Sets the ranks of the user from Current Round
             decider.setRankFor(allUsers[it->first-1]);
             
             if(allUsers[(it->first)-1].getRank() > highestRank){
@@ -333,7 +333,6 @@ void Table::payTheWinner(int oneRemainderId){ // TODO Pay the money who is on th
     
     }else{
         User *winner = &allUsers[oneRemainderId-1];
-
         winner->getChips().addChips(moneyOnTable);
         cout << "Everyone folded but " << winner->getName() << ". Therefore is the only Winner!" << endl;;
         moneyOnTable.resetChips();

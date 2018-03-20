@@ -23,7 +23,7 @@ void Debugger::start(){
     //test_Cpp();
     //testFunction_removeAmountAsChips();     // TEST 1
     //testFunction_amountToChipConverter();   // TEST 2
-    testClass_Decider();                    // TEST 3
+    //testClass_Decider();                    // TEST 3
     //testFunction_payTheWinner();            // TEST 4
     
 }
